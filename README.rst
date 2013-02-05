@@ -73,15 +73,15 @@ from system Python_ and any packages that may be installed there.
 
 2. Clone your fork:
 
-    ``git clone git@github.com:<username>/oai-harvest.git``
+   ``git clone git@github.com:<username>/oai-harvest.git``
 
 3. Install dependencies:
 
-    ``pip install -r requirements.txt``
+   ``pip install -r requirements.txt``
 
 4. Install in develop / editable mode:
 
-    ``pip install -e .``
+   ``pip install -e .``
 
 
 Bugs, Feature requests etc.
