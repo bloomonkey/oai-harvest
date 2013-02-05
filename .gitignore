@@ -1,0 +1,22 @@
+# Eclipse project
+.project
+.pydevproject
+org.eclipse.*
+
+# Python compiled/optimized files
+*.py[co]
+
+# Python packaging/distribution
+*.egg
+*.egg-info
+dist
+build
+eggs
+parts
+bin
+var
+sdist
+develop-eggs
+.installed.cfg
+
+
