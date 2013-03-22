@@ -15,6 +15,15 @@ from datetime import datetime
 def add_provider(args):
     global logger
     addlogger = logger.getChild('add')
+    # Validate name
+    if len(args.name) > 8:
+        addlogger.critical('Short name for new provider must be no more than '
+                           '8 characters long')
+        return 1
+    elif args.name.startswith(('http:', 'https:')):
+        addlogger.critical('Short name for new provider must not begin "http:" or '
+                           '"https:"')
+        return 1
     # Get any missing information
     if args.url is None:
         args.url = raw_input('Base URL:'.ljust(20))
