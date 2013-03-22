@@ -33,6 +33,7 @@ from oaipmh.metadata import MetadataRegistry, oai_dc_reader
 
 from metadata import DefaultingMetadataRegistry, XMLMetadataReader
 
+
 class OAIHarvester(object):
 
     def __init__(self, mdRegistry):
@@ -112,8 +113,8 @@ argparser.add_argument('provider',
 argparser.add_argument('-p', '--metadataPrefix',
                        action='store', dest='metadataPrefix',
                        default=None,
-                       help=("where to output files for harvested records. "
-                             "default is current working path")
+                       help=("the metadataPrefix of the format (XML Schema) "
+                             "in which records should be harvested.")
                        )
 argparser.add_argument("-f", "--from", dest="from_",
                        default=None,
