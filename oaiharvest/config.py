@@ -12,11 +12,6 @@ from argparse import ArgumentParser
 from datetime import datetime
 
 
-class InputError(ValueError):
-    """Custom Exception class for user input errors."""
-    pass
-
-
 def add_provider(args):
     global logger
     addlogger = logger.getChild('add')
@@ -26,13 +21,15 @@ def add_provider(args):
         if not args.url:
             addlogger.critical('Base URL for new provider not supplied')
             return 1
+    # TODO: Validate Base URL by fetching Identify
     if args.dest is None:
-        args.dest = raw_input('destination directory: '.ljust(20))
+        args.dest = raw_input('Destination directory: '.ljust(20))
         if not args.dest:
             addlogger.info('Destination for data for new provider not supplied'
                            ' using default `pwd`: {0}'.format(os.getcwd())
                            )
             args.dest = os.getcwd()
+    # TODO: parse ListMetadataPrefixes reponse
     if args.metadataPrefix is None:
         args.metadataPrefix = raw_input('metadataPrefix [oai_dc]:'.ljust(20))
         if not args.metadataPrefix:
@@ -78,6 +75,36 @@ def rm_provider(args):
             else:
                 rmlogger.info('Deleted provider "{0}"'.format(name))
     return 0
+
+
+def list_providers(args):
+    global logger
+    listlogger = logger.getChild('remove')
+    if args.url:
+        sql = 'SELECT name, url FROM providers'
+        label = 'Base URL'
+    elif args.dest:
+        sql = 'SELECT name, destination FROM providers'
+        label = "Destination"
+    elif args.metadataPrefix:
+        sql = 'SELECT name, metadataPrefix FROM providers'
+        label = "metadataPrefix"
+    elif args.lastHarvest:
+        sql = 'SELECT name, lastHarvest FROM providers'
+        label = "Last Harvest Time"
+    else:
+        # Default is smart URL for next harvest request
+        sql = ("SELECT name, url || "
+               "'?verb=ListRecords&metadataPrefix=' || "
+               "metadataPrefix || '&from=' || lastHarvest "
+               "FROM providers")
+        label = 'URL for next harvest'
+    cursor = args.cxn.execute(sql)
+    sys.stdout.write(''.join(['name'.ljust(9), label, '\n']))
+    sys.stdout.write(' '.join(['========', '=' * len(label), '\n']))
+    for row in cursor:
+        sys.stdout.write('{0:<8} {1}\n'.format(row[0], row[1]))
+        sys.stdout.flush()
 
 
 def verify_database(path):
@@ -135,7 +162,7 @@ argparser.add_argument('-d', '--database',
                        )
 subparsers = argparser.add_subparsers(help='Actions')
 # Create the parser for the "add" command
-parser_add = subparsers.add_parser('add', help='Add a new OAI-PMH target')
+parser_add = subparsers.add_parser('add', help='Add a new OAI-PMH provider')
 parser_add.add_argument('name',
                         action='store',
                         help=("Short identifying name for OAI-PMH Provider.")
@@ -163,7 +190,7 @@ group.add_argument('-d', '--dir',
 parser_add.set_defaults(func=add_provider)
 # Create the parser for the "remove" command
 parser_rm = subparsers.add_parser('rm',
-                                  help='Remove a registered OAI-PMH target'
+                                  help='Remove a registered OAI-PMH provider'
                                   )
 parser_rm.add_argument('name',
                        action='store',
@@ -172,8 +199,33 @@ parser_rm.add_argument('name',
                              "to remove.")
                        )
 parser_rm.set_defaults(func=rm_provider)
+# Create the parser for the "list" command
+parser_list = subparsers.add_parser('list',
+                                    help='List registered OAI-PMH provider'
+                                    )
+group = parser_list.add_mutually_exclusive_group()
+group.add_argument('-u', '--url',
+                   action='store_true', dest='url',
+                   help="list providers with their base URLs (default)"
+                   )
+group.add_argument('-d', '--dest',
+                   action='store_true', dest='dest',
+                   default=False,
+                   help="list providers with their destinations"
+                   )
+group.add_argument('-p', '--metadataPrefix',
+                   action='store_true', dest='metadataPrefix',
+                   default=False,
+                   help="list providers with their metadataPrefixes"
+                   )
+group.add_argument('-l', '--lastHarvest',
+                   action='store_true', dest='lastHarvest',
+                   default=False,
+                   help="list providers with their last harvest date and time"
+                   )
+parser_list.set_defaults(func=list_providers)
 
-
+# Check for existence of directory for persistent db, logs etc.
 appdir = os.path.expanduser('~/.oai-harvest')
 if not os.path.exists(appdir):
     os.mkdir(appdir)
