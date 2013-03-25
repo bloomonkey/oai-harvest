@@ -29,9 +29,9 @@ def add_provider(args):
         addlogger.critical('Short name for new provider must be no more than '
                            '{0} characters long'.format(MAX_NAME_LENGTH))
         return 1
-    elif args.name.startswith(('http:', 'https:')):
-        addlogger.critical('Short name for new provider must not begin "http:" or '
-                           '"https:"')
+    elif args.name.startswith(('http://', 'https://')) or args.name == 'all':
+        addlogger.critical('Short name for new provider may not be "all" nor '
+                           'may it begin "http://" or "https://"')
         return 1
     # Try to create row now to avoid unnecessary validation if duplicate
     try:
