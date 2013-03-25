@@ -23,8 +23,9 @@ Distributed under the terms of the BSD 3-clause License
 <http://opensource.org/licenses/BSD-3-Clause>.
 """
 
-import sys
+import logging
 import os
+import sys
 
 from argparse import ArgumentParser
 
@@ -58,7 +59,7 @@ class DirectoryOAIHarvester(OAIHarvester):
         self._dir = directory
 
     def harvest(self, baseUrl, metadataPrefix, **kwargs):
-        
+        logger = logging.getLogger(__name__).getChild(self.__class__.__name__)
         for header, metadata, about in self._listRecords(
                  baseUrl,
                  metadataPrefix=metadataPrefix,
@@ -66,6 +67,7 @@ class DirectoryOAIHarvester(OAIHarvester):
             fp =  os.path.join(self._dir,
                                "{0}.xml".format(header.identifier())
                                )
+            logger.debug('Writing to file {0}'.format(fp))
             with open(fp, 'w') as fh:
                 fh.write(metadata)
 
@@ -80,12 +82,15 @@ def main(argv=None):
     if args.dir:
         harvester = DirectoryOAIHarvester(metadata_registry,
                                           os.path.abspath(args.dir))
+    logger = logging.getLogger(__name__).getChild('main')
     for provider in args.provider:
+        logger.info('Harvesting from {0}'.format(provider))
         mdp = args.metadataPrefix
         if not provider.startswith('http://'):
             # Fetch configuration from persistent storage
-            # Allow over-ride of default metadataPrefix
-            raise NotImplementedError
+            # Do not allow over-ride of default metadataPrefix
+            logger.critical('Named providers not yet implemented')
+            return 1
         else:
             baseUrl = provider
             from_ = args.from_
@@ -140,6 +145,24 @@ group.add_argument('-d', '--dir',
 # Set up metadata registry
 xmlReader = XMLMetadataReader()
 metadata_registry = DefaultingMetadataRegistry(defaultReader=xmlReader)
+
+# Check for existence of directory for persistent db, logs etc.
+appdir = os.path.expanduser('~/.oai-harvest')
+if not os.path.exists(appdir):
+    os.mkdir(appdir)
+
+# Set up logger
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s %(name)-16s %(levelname)-8s %(message)s',
+    datefmt='[%Y-%m-%d %H:%M:%S]',
+    filename=os.path.join(appdir, 'harvest.log')
+)
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(levelname)-8s %(message)s')
+ch.setFormatter(formatter)
+logging.getLogger(__name__).addHandler(ch)
 
 
 if __name__ == "__main__":
