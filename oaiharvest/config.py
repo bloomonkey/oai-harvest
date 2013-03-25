@@ -215,8 +215,8 @@ argparser = ArgumentParser(description=docbits[0],
 argparser.add_argument('-d', '--database',
                        action='store', dest='databasePath',
                        default=os.path.expanduser('~/.oai-harvest/config.db'),
-                       help=("Path to database used for making configurations "
-                             "persistent.")
+                       help=("Path to database used for making provider "
+                             "configurations persistent.")
                        )
 subparsers = argparser.add_subparsers(help='Actions')
 # Create the parser for the "add" command
