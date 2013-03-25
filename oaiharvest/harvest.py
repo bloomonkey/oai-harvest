@@ -45,6 +45,8 @@ class OAIHarvester(object):
         # Add metatdataPrefix to args
         kwargs['metadataPrefix'] = metadataPrefix
         client = Client(baseUrl, metadata_registry)
+        # Check server timestamp granularity support
+        client.updateGranularity()
         for record in client.listRecords(**kwargs):
             yield record
 
