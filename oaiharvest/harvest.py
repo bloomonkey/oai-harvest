@@ -185,7 +185,9 @@ argparser.add_argument('provider',
                        nargs='+',
                        help=("OAI-PMH Provider from which to harvest. This may"
                              " be the base URL of an OAI-PMH server, or the "
-                             "short name of a configured provider.")
+                             "short name of a configured provider. You may "
+                             "also specify \"all\" for all configured "
+                             "providers.")
                        )
 argparser.add_argument('-p', '--metadataPrefix',
                        action='store', dest='metadataPrefix',
