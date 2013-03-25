@@ -94,7 +94,6 @@ def main(argv=None):
         args.until = datetime.strptime(args.until, "%Y-%m-%d")
     for provider in args.provider:
         logger.info('Harvesting from {0}'.format(provider))
-        mdp = args.metadataPrefix
         if not provider.startswith('http://'):
             # Fetch configuration from persistent storage
             # Allow over-ride of default metadataPrefix
@@ -103,10 +102,10 @@ def main(argv=None):
         else:
             baseUrl = provider
 
-        if mdp is None:
-            mdp = 'oai_dc'
+        if args.metadataPrefix is None:
+            args.metadataPrefix = 'oai_dc'
         harvester.harvest(baseUrl,
-                          mdp,
+                          args.metadataPrefix,
                           from_=args.from_,
                           until=args.until
                           )
