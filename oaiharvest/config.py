@@ -11,6 +11,13 @@ import sys
 from argparse import ArgumentParser
 from datetime import datetime
 
+# Import oaipmh for validation purposes
+from oaipmh.client import Client
+from oaipmh.metadata import MetadataRegistry, oai_dc_reader
+from oaipmh.error import XMLSyntaxError
+from urllib2 import HTTPError
+
+
 MAX_NAME_LENGTH = 15
 
 
@@ -27,12 +34,24 @@ def add_provider(args):
                            '"https:"')
         return 1
     # Get any missing information
+    # Base URL
     if args.url is None:
         args.url = raw_input('Base URL:'.ljust(20))
         if not args.url:
             addlogger.critical('Base URL for new provider not supplied')
             return 1
-    # TODO: Validate Base URL by fetching Identify
+    # Set up an OAI-PMH client for validating configurations
+    registry = MetadataRegistry()
+    registry.registerReader('oai_dc', oai_dc_reader)
+    client = Client(args.url, registry)
+    # Validate Base URL by fetching Identify
+    try:
+        client.identify()
+    except (XMLSyntaxError, HTTPError):
+        addlogger.critical('Base URL for new provider does not return a valid '
+                           'response to an `Identify` request')
+        return 1
+    # Destination
     if args.dest is None:
         args.dest = raw_input('Destination directory: '.ljust(20))
         if not args.dest:
@@ -40,7 +59,8 @@ def add_provider(args):
                            ' using default `pwd`: {0}'.format(os.getcwd())
                            )
             args.dest = os.getcwd()
-    # TODO: parse ListMetadataPrefixes reponse
+    # TODO: Parse ListMetadataPrefixes response
+    # metadataPrefix
     if args.metadataPrefix is None:
         args.metadataPrefix = raw_input('metadataPrefix [oai_dc]:'.ljust(20))
         if not args.metadataPrefix:
