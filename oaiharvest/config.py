@@ -11,14 +11,16 @@ import sys
 from argparse import ArgumentParser
 from datetime import datetime
 
+MAX_NAME_LENGTH = 15
+
 
 def add_provider(args):
-    global logger
+    global logger, MAX_NAME_LENGTH
     addlogger = logger.getChild('add')
     # Validate name
-    if len(args.name) > 8:
+    if len(args.name) > MAX_NAME_LENGTH:
         addlogger.critical('Short name for new provider must be no more than '
-                           '8 characters long')
+                           '{0} characters long'.format(MAX_NAME_LENGTH))
         return 1
     elif args.name.startswith(('http:', 'https:')):
         addlogger.critical('Short name for new provider must not begin "http:" or '
@@ -87,7 +89,7 @@ def rm_provider(args):
 
 
 def list_providers(args):
-    global logger
+    global logger, MAX_NAME_LENGTH
     listlogger = logger.getChild('remove')
     if args.url:
         sql = 'SELECT name, url FROM providers'
@@ -109,10 +111,13 @@ def list_providers(args):
                "FROM providers")
         label = 'URL for next harvest'
     cursor = args.cxn.execute(sql)
-    sys.stdout.write(''.join(['name'.ljust(9), label, '\n']))
-    sys.stdout.write(' '.join(['========', '=' * len(label), '\n']))
+    sys.stdout.write(''.join(['name'.ljust(MAX_NAME_LENGTH + 1),
+                              label, '\n']))
+    sys.stdout.write(' '.join(['=' * MAX_NAME_LENGTH, '=' * len(label), '\n']))
     for row in cursor:
-        sys.stdout.write('{0:<8} {1}\n'.format(row[0], row[1]))
+        sys.stdout.write('{0:<{width}} {1}\n'.format(row[0],
+                                                     row[1],
+                                                     width=MAX_NAME_LENGTH))
         sys.stdout.flush()
 
 
@@ -136,11 +141,11 @@ def verify_database(path):
         # Create the table
         cxn.execute("CREATE TABLE providers("
                     "id integer primary key, "
-                    "name varchar unique, "
+                    "name varchar({0}) unique, "
                     "url varchar, "
                     "destination varchar, "
                     "metadataPrefix varchar, "
-                    "lastHarvest timestamp)"
+                    "lastHarvest timestamp)".format(MAX_NAME_LENGTH)
                     )
     return cxn
 
