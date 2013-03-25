@@ -28,6 +28,7 @@ import os
 import sys
 
 from argparse import ArgumentParser
+from datetime import datetime
 
 from oaipmh.client import Client
 from oaipmh.metadata import MetadataRegistry, oai_dc_reader
@@ -84,6 +85,11 @@ def main(argv=None):
         harvester = DirectoryOAIHarvester(metadata_registry,
                                           os.path.abspath(args.dir))
     logger = logging.getLogger(__name__).getChild('main')
+    # Parse from and until into datetime objects
+    if args.from_ is not None:
+        args.from_ = datetime.strptime(args.from_, "%Y-%m-%d")
+    if args.until is not None:
+        args.until = datetime.strptime(args.until, "%Y-%m-%d")
     for provider in args.provider:
         logger.info('Harvesting from {0}'.format(provider))
         mdp = args.metadataPrefix
@@ -94,13 +100,12 @@ def main(argv=None):
             return 1
         else:
             baseUrl = provider
-            from_ = args.from_
 
         if mdp is None:
             mdp = 'oai_dc'
         harvester.harvest(baseUrl,
                           mdp,
-                          from_=from_,
+                          from_=args.from_,
                           until=args.until
                           )
 
