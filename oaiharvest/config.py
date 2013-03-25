@@ -33,6 +33,21 @@ def add_provider(args):
         addlogger.critical('Short name for new provider must not begin "http:" or '
                            '"https:"')
         return 1
+    # Try to create row now to avoid unnecessary validation if duplicate
+    try:
+        with args.cxn:
+            args.cxn.execute("INSERT INTO providers(name, lastHarvest) values "
+                             "(?, ?)",
+                             (args.name, datetime.fromtimestamp(0))
+            )
+    except sqlite3.IntegrityError:
+        addlogger.critical('Unable to add provider "{0}"; '
+                           'provider with this name already exists'
+                           ''.format(args.name)
+                           )
+        return 1
+    else:
+        addlogger.info('Adding provider "{0}"'.format(args.name))
     # Get any missing information
     # Base URL
     if args.url is None:
@@ -67,28 +82,28 @@ def add_provider(args):
             addlogger.info('metadataPrefix for new provider not supplied. '
                            'using default: oai_dc')
             args.metadataPrefix = 'oai_dc'
-    try:
-        with args.cxn:
-            args.cxn.execute("INSERT INTO providers(name, url, destination, "
-                             "metadataPrefix, lastHarvest) values "
-                             "(?, ?, ?, ?, ?)",
-                             (args.name,
-                              args.url,
-                              args.dest,
-                              args.metadataPrefix,
-                              datetime.fromtimestamp(0)
-                              )
-            )
-    except sqlite3.IntegrityError:
-        addlogger.critical('Unable to add provider "{0}"; '
-                           'provider with this name already exists'
-                           ''.format(args.name)
-                           )
-        return 1
-    else:
-        addlogger.info('Added provider "{0}": {1}'.format(args.name,
-                                                          args.url))
-        return 0
+    with args.cxn:
+        args.cxn.execute("UPDATE providers SET "
+                         "url=?, "
+                         "destination=?, "
+                         "metadataPrefix=? "
+                         "WHERE name=?",
+                         (args.url,
+                          args.dest,
+                          args.metadataPrefix,
+                          args.name
+                          )
+        )
+    addlogger.info('URL for next harvest: {0}?verb=ListRecords'
+                   '&metadataPrefix={1}'
+                   '&from={2:%Y-%m-%dT%H:%M:%SZ%z}'
+                   ''.format(args.url,
+                             args.metadataPrefix,
+                             datetime.fromtimestamp(0)
+                             )
+                   )
+    return 0
+
 
 def rm_provider(args):
     global logger
