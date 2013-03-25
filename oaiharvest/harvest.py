@@ -101,6 +101,8 @@ def main(argv=None):
             return 1
         else:
             baseUrl = provider
+            if args.dir is None:
+                args.dir = '.'
 
         if args.metadataPrefix is None:
             args.metadataPrefix = 'oai_dc'
@@ -144,7 +146,7 @@ argparser.add_argument("-u", "--until", dest="until",
 group = argparser.add_mutually_exclusive_group()
 group.add_argument('-d', '--dir',
                    action='store', dest='dir',
-                   default='.',
+                   default=None,
                    help=("where to output files for harvested records."
                          "default: current working path")
                    )
