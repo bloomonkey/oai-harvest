@@ -84,9 +84,6 @@ def main(argv=None):
         args = argparser.parse_args()
     else:
         args = argparser.parse_args(argv)
-    if args.dir:
-        harvester = DirectoryOAIHarvester(metadata_registry,
-                                          os.path.abspath(args.dir))
     logger = logging.getLogger(__name__).getChild('main')
     # Parse from and until into datetime objects
     if args.from_ is not None:
@@ -147,6 +144,10 @@ def main(argv=None):
 
         if args.metadataPrefix is None:
             args.metadataPrefix = 'oai_dc'
+
+        # Init harvester object
+        harvester = DirectoryOAIHarvester(metadata_registry,
+                                          os.path.abspath(args.dir))
         harvester.harvest(baseUrl,
                           args.metadataPrefix,
                           from_=args.from_,
