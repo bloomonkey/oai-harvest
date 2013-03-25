@@ -118,14 +118,15 @@ def list_providers(args):
 
 def verify_database(path):
     """Verify that a suitable database exists, create it if not."""
-    logger = logging.getLogger(__name__).getChild('verify')
+    global logger
+    var_logger = logger.getChild('verify')
     try:
         cxn = sqlite3.connect(
             path,
             detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES
         )
     except sqlite3.OperationalError:
-        logger.critical('Database file "{0}" does not exist'.format(path))
+        var_logger.critical('Database file "{0}" does not exist'.format(path))
         return 1
     # Verify that table exists
     try:
