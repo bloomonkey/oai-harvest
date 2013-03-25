@@ -119,6 +119,12 @@ docbits = __doc__.split('\n\n')
 argparser = ArgumentParser("harvest(.py)",
                            description=docbits[0],
                            epilog='\n\n'.join(docbits[-2:]))
+argparser.add_argument('--db', '--database',
+                       action='store', dest='databasePath',
+                       default=os.path.expanduser('~/.oai-harvest/config.db'),
+                       help=("Path to database used for making provider "
+                             "configurations persistent.")
+                       )
 argparser.add_argument('provider',
                        action='store',
                        nargs='+',
