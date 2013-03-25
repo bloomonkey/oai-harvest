@@ -11,6 +11,13 @@ import sys
 from argparse import ArgumentParser
 from datetime import datetime
 
+# Import oaipmh for validation purposes
+from oaipmh.client import Client
+from oaipmh.metadata import MetadataRegistry, oai_dc_reader
+from oaipmh.error import XMLSyntaxError
+from urllib2 import HTTPError
+
+
 MAX_NAME_LENGTH = 15
 
 
@@ -26,38 +33,12 @@ def add_provider(args):
         addlogger.critical('Short name for new provider must not begin "http:" or '
                            '"https:"')
         return 1
-    # Get any missing information
-    if args.url is None:
-        args.url = raw_input('Base URL:'.ljust(20))
-        if not args.url:
-            addlogger.critical('Base URL for new provider not supplied')
-            return 1
-    # TODO: Validate Base URL by fetching Identify
-    if args.dest is None:
-        args.dest = raw_input('Destination directory: '.ljust(20))
-        if not args.dest:
-            addlogger.info('Destination for data for new provider not supplied'
-                           ' using default `pwd`: {0}'.format(os.getcwd())
-                           )
-            args.dest = os.getcwd()
-    # TODO: parse ListMetadataPrefixes reponse
-    if args.metadataPrefix is None:
-        args.metadataPrefix = raw_input('metadataPrefix [oai_dc]:'.ljust(20))
-        if not args.metadataPrefix:
-            addlogger.info('metadataPrefix for new provider not supplied. '
-                           'using default: oai_dc')
-            args.metadataPrefix = 'oai_dc'
+    # Try to create row now to avoid unnecessary validation if duplicate
     try:
         with args.cxn:
-            args.cxn.execute("INSERT INTO providers(name, url, destination, "
-                             "metadataPrefix, lastHarvest) values "
-                             "(?, ?, ?, ?, ?)",
-                             (args.name,
-                              args.url,
-                              args.dest,
-                              args.metadataPrefix,
-                              datetime.fromtimestamp(0)
-                              )
+            args.cxn.execute("INSERT INTO providers(name, lastHarvest) values "
+                             "(?, ?)",
+                             (args.name, datetime.fromtimestamp(0))
             )
     except sqlite3.IntegrityError:
         addlogger.critical('Unable to add provider "{0}"; '
@@ -66,9 +47,71 @@ def add_provider(args):
                            )
         return 1
     else:
-        addlogger.info('Added provider "{0}": {1}'.format(args.name,
-                                                          args.url))
-        return 0
+        addlogger.info('Adding provider "{0}"'.format(args.name))
+    # Get any missing information
+    # Base URL
+    if args.url is None:
+        args.url = raw_input('Base URL:'.ljust(20))
+        if not args.url:
+            addlogger.critical('Base URL for new provider not supplied')
+            return 1
+    # Set up an OAI-PMH client for validating configurations
+    registry = MetadataRegistry()
+    registry.registerReader('oai_dc', oai_dc_reader)
+    client = Client(args.url, registry)
+    # Validate Base URL by fetching Identify
+    try:
+        client.identify()
+    except (XMLSyntaxError, HTTPError):
+        addlogger.critical('Base URL for new provider does not return a valid '
+                           'response to an `Identify` request')
+        return 1
+    # Destination
+    if args.dest is None:
+        args.dest = raw_input('Destination directory: '.ljust(20))
+        if not args.dest:
+            addlogger.info('Destination for data for new provider not supplied'
+                           ' using default `pwd`: {0}'.format(os.getcwd())
+                           )
+            args.dest = os.getcwd()
+    # metadataPrefix
+    # Check that selected metadataPrefix is available from provider
+    # Fetch list of available formats
+    mdps = dict((mdpinfo[0], mdpinfo[1:])
+                    for mdpinfo in
+                    client.listMetadataFormats())
+    while args.metadataPrefix not in mdps:
+        print "Available metadataPrefix values:"
+        # List available formats
+        for mdp in mdps:
+            print mdp, '-', mdps[mdp][1]
+        args.metadataPrefix = raw_input('metadataPrefix [oai_dc]:'.ljust(20))
+        if not args.metadataPrefix:
+            addlogger.info('metadataPrefix for new provider not supplied. '
+                           'using default: oai_dc')
+            args.metadataPrefix = 'oai_dc'
+    with args.cxn:
+        args.cxn.execute("UPDATE providers SET "
+                         "url=?, "
+                         "destination=?, "
+                         "metadataPrefix=? "
+                         "WHERE name=?",
+                         (args.url,
+                          args.dest,
+                          args.metadataPrefix,
+                          args.name
+                          )
+        )
+    addlogger.info('URL for next harvest: {0}?verb=ListRecords'
+                   '&metadataPrefix={1}'
+                   '&from={2:%Y-%m-%dT%H:%M:%SZ%z}'
+                   ''.format(args.url,
+                             args.metadataPrefix,
+                             datetime.fromtimestamp(0)
+                             )
+                   )
+    return 0
+
 
 def rm_provider(args):
     global logger
