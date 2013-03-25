@@ -74,9 +74,17 @@ def add_provider(args):
                            ' using default `pwd`: {0}'.format(os.getcwd())
                            )
             args.dest = os.getcwd()
-    # TODO: Parse ListMetadataPrefixes response
     # metadataPrefix
-    if args.metadataPrefix is None:
+    # Check that selected metadataPrefix is available from provider
+    # Fetch list of available formats
+    mdps = dict((mdpinfo[0], mdpinfo[1:])
+                    for mdpinfo in
+                    client.listMetadataFormats())
+    while args.metadataPrefix not in mdps:
+        print "Available metadataPrefix values:"
+        # List available formats
+        for mdp in mdps:
+            print mdp, '-', mdps[mdp][1]
         args.metadataPrefix = raw_input('metadataPrefix [oai_dc]:'.ljust(20))
         if not args.metadataPrefix:
             addlogger.info('metadataPrefix for new provider not supplied. '
