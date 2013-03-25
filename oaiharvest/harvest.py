@@ -32,6 +32,7 @@ from datetime import datetime
 
 from oaipmh.client import Client
 from oaipmh.metadata import MetadataRegistry, oai_dc_reader
+from oaipmh.error import NoRecordsMatchError
 
 from metadata import DefaultingMetadataRegistry, XMLMetadataReader
 from config import verify_database
@@ -148,11 +149,23 @@ def main(argv=None):
         # Init harvester object
         harvester = DirectoryOAIHarvester(metadata_registry,
                                           os.path.abspath(args.dir))
-        harvester.harvest(baseUrl,
-                          args.metadataPrefix,
-                          from_=args.from_,
-                          until=args.until
-                          )
+        try:
+            harvester.harvest(baseUrl,
+                              args.metadataPrefix,
+                              from_=args.from_,
+                              until=args.until
+                              )
+        except NoRecordsMatchError:
+            # Nothing to harvest
+            logger.info("0 records to harvest")
+            logger.debug("The combination of the values of the from={0}, "
+                         "until={1}, set=(N/A) and metadataPrefix={2} "
+                         "arguments results in an empty list."
+                         "".format(args.from_,
+                                   args.until,
+                                   args.metadataPrefix)
+                         )
+            continue
 
 
 # Set up argument parser
