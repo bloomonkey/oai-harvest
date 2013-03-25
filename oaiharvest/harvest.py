@@ -89,7 +89,7 @@ def main(argv=None):
         mdp = args.metadataPrefix
         if not provider.startswith('http://'):
             # Fetch configuration from persistent storage
-            # Do not allow over-ride of default metadataPrefix
+            # Allow over-ride of default metadataPrefix
             logger.critical('Named providers not yet implemented')
             return 1
         else:
