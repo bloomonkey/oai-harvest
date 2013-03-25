@@ -65,7 +65,8 @@ class DirectoryOAIHarvester(OAIHarvester):
                  metadataPrefix=metadataPrefix,
                  **kwargs):
             fp =  os.path.join(self._dir,
-                               "{0}.xml".format(header.identifier())
+                               "{0}.{1}.xml".format(header.identifier(),
+                                                    metadataPrefix)
                                )
             logger.debug('Writing to file {0}'.format(fp))
             with open(fp, 'w') as fh:
