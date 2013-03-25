@@ -95,6 +95,15 @@ def main(argv=None):
     cxn = verify_database(args.databasePath)
     # Make a set of providers - don't repeat for repeated arguments
     providers = set(args.provider)
+    # Check for "all" providers
+    if "all" in args.provider:
+        # Remove "all" from set
+        providers.remove('all')
+        # Update set with all configured providers
+        providers.update([row[0]
+                          for row
+                          in cxn.execute('SELECT name FROM providers')
+                          ])
     for provider in providers:
         if not provider.startswith('http://'):
             # Fetch configuration from persistent storage
