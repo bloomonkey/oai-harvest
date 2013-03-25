@@ -34,6 +34,7 @@ from oaipmh.client import Client
 from oaipmh.metadata import MetadataRegistry, oai_dc_reader
 
 from metadata import DefaultingMetadataRegistry, XMLMetadataReader
+from config import verify_database
 
 
 class OAIHarvester(object):
@@ -92,15 +93,55 @@ def main(argv=None):
         args.from_ = datetime.strptime(args.from_, "%Y-%m-%d")
     if args.until is not None:
         args.until = datetime.strptime(args.until, "%Y-%m-%d")
+    # Establish connection to persistent storage
+    cxn = verify_database(args.databasePath)
     for provider in args.provider:
-        logger.info('Harvesting from {0}'.format(provider))
         if not provider.startswith('http://'):
             # Fetch configuration from persistent storage
+            cursor = cxn.execute('SELECT url, '
+                                 'destination, '
+                                 'metadataPrefix, '
+                                 'lastHarvest [timestamp]'
+                                 'FROM providers '
+                                 'WHERE name=?', (provider,))
+            row = cursor.fetchone()
+            if row is None:
+                logger.error("Provider {0} does not exists in database {1}"
+                             "".format(provider, args.databasePath))
+                continue
+            baseUrl = row[0]
+            logger.info('Harvesting from configured provider {0} - {1}'
+                        ''.format(provider, baseUrl))
+            # Allow over-ride of default destination
+            if args.dir is not None:
+                logger.warning('Value for command line option --dir'
+                               ' over-rides configured destination')
+            else:
+                args.dir = row[1]
             # Allow over-ride of default metadataPrefix
-            logger.critical('Named providers not yet implemented')
-            return 1
+            if args.metadataPrefix is not None:
+                logger.warning('Value for command line option --metadataPrefix'
+                               ' over-rides configured value')
+            else:
+                args.metadataPrefix = row[2]
+            # Allow over-ride of stored lastHarvest time
+            # e.g. to repair some locally munged data
+            if args.from_ is not None:
+                logger.warning('Value for command line option --from'
+                               ' over-rides recorded lastHarvest timestamp')
+            else:
+                args.from_ = row[3]
+            # Update database with lastHarvest time now
+            # The first request might create a snapshot of the data on the
+            # provider server in order for resumption tokens to work correctly.
+            # Any records added after this snapshot, but before completion of
+            # harvesting should be included in next harvest.
+            with cxn:
+                cxn.execute("UPDATE providers SET lastHarvest=? WHERE name=?",
+                            (datetime.now(), provider))
         else:
             baseUrl = provider
+            logger.info('Harvesting from {0}'.format(baseUrl))
             if args.dir is None:
                 args.dir = '.'
 
