@@ -93,7 +93,9 @@ def main(argv=None):
         args.until = datetime.strptime(args.until, "%Y-%m-%d")
     # Establish connection to persistent storage
     cxn = verify_database(args.databasePath)
-    for provider in args.provider:
+    # Make a set of providers - don't repeat for repeated arguments
+    providers = set(args.provider)
+    for provider in providers:
         if not provider.startswith('http://'):
             # Fetch configuration from persistent storage
             cursor = cxn.execute('SELECT url, '
