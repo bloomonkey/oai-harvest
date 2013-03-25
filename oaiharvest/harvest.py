@@ -128,7 +128,9 @@ argparser.add_argument('--db', '--database',
 argparser.add_argument('provider',
                        action='store',
                        nargs='+',
-                       help="OAI-PMH Provider from which to harvest."
+                       help=("OAI-PMH Provider from which to harvest. This may"
+                             " be the base URL of an OAI-PMH server, or the "
+                             "short name of a configured provider.")
                        )
 argparser.add_argument('-p', '--metadataPrefix',
                        action='store', dest='metadataPrefix',
