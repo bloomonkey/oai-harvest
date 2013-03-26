@@ -1,7 +1,7 @@
 OAI Harvest
 ===========
 
-5th February 2013 (2013-02-05)
+26th March 2013 (2013-03-26)
 
 Contents
 --------
@@ -14,12 +14,30 @@ Contents
 - `Installation`_
 - `Bugs, Feature requests etc.`_
 - `Copyright & Licensing`_
-                                   
+- `Examples`_
+
 
 Description
 -----------
 
-Harvest records from an OAI-PMH provider.
+A harvester to collect records from an OAI-PMH enabled provider.
+
+The harvester can be used to carry out one-time harvesting of all records from
+a particular OAI-PMH provider by giving its base URL. It can also be used for
+selective harvesting, e.g. to harvest only records updated after, or before 
+specified dates.
+
+To assist in regular harvesting from one or more OAI-PMH providers, there's
+a provider registry. It is possible to associate a short memorable name for a
+provider with its base URLs, destination directory for harvested records, and
+the format (metadataPrefix) in which records should be harvested. The registry
+will also record the date and time of the most recent harvest, and
+automatically add this to subsequent requests in order to avoid repeatedly
+harvesting unmodified records.
+
+This could be used in conjunction with a scheduler (e.g. CRON) to maintain a
+reasonably up-to-date copy of the record in one or more providers. `Examples`_
+of how to accomplish these tasks are available below. 
 
 
 Author(s)

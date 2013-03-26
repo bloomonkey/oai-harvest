@@ -15,7 +15,8 @@ py_version = getattr(sys, 'version_info', (0, 0, 0))
 # Basic information
 _name = "oaiharvest"
 _version = "0.1"
-_description = "Harvest records from an OAI-PMH provider."
+_description = ("A harvester to collect records from an OAI-PMH enabled "
+                "provider.")
 _author = 'John Harrison'
 _author_email = 'john.harrison@liv.ac.uk'
 
