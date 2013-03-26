@@ -78,9 +78,7 @@ Installation
 Users
 ~~~~~
 
-```sh
-pip install git+http://github.com/bloomonkey/oai-harvest.git#egg=oaiharvest
-```
+``pip install git+http://github.com/bloomonkey/oai-harvest.git#egg=oaiharvest``
 
 
 Developers
