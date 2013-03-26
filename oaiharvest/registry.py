@@ -1,7 +1,5 @@
 # encoding: utf-8
-"""Configure harvesting of records from OAI-PMH provider(s).
-
-"""
+"""Manage registry of OAI-PMH providers."""
 
 import logging
 import os
@@ -54,10 +52,10 @@ def add_provider(cxn, args):
         if not args.url:
             addlogger.critical('Base URL for new provider not supplied')
             return 1
-    # Set up an OAI-PMH client for validating configurations
-    registry = MetadataRegistry()
-    registry.registerReader('oai_dc', oai_dc_reader)
-    client = Client(args.url, registry)
+    # Set up an OAI-PMH client for validating providers
+    md_registry = MetadataRegistry()
+    md_registry.registerReader('oai_dc', oai_dc_reader)
+    client = Client(args.url, md_registry)
     # Validate Base URL by fetching Identify
     try:
         client.identify()
@@ -214,9 +212,9 @@ argparser = ArgumentParser(description=docbits[0],
                            epilog='\n\n'.join(docbits[-2:]))
 argparser.add_argument('-d', '--database',
                        action='store', dest='databasePath',
-                       default=os.path.expanduser('~/.oai-harvest/config.db'),
-                       help=("Path to database used for making provider "
-                             "configurations persistent.")
+                       default=os.path.expanduser('~/.oai-harvest/registry.db'),
+                       help=("Path to provider registry database. Currently "
+                             "supports sqlite3 only.")
                        )
 subparsers = argparser.add_subparsers(help='Actions')
 # Create the parser for the "add" command
@@ -293,7 +291,7 @@ logging.basicConfig(
     level=logging.DEBUG,
     format='%(asctime)s %(name)-16s %(levelname)-8s %(message)s',
     datefmt='[%Y-%m-%d %H:%M:%S]',
-    filename=os.path.join(appdir, 'config.log')
+    filename=os.path.join(appdir, 'registry.log')
 )
 logger = logging.getLogger(__name__)
 ch = logging.StreamHandler()

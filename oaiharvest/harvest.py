@@ -35,7 +35,7 @@ from oaipmh.metadata import MetadataRegistry, oai_dc_reader
 from oaipmh.error import NoRecordsMatchError
 
 from metadata import DefaultingMetadataRegistry, XMLMetadataReader
-from config import verify_database
+from registry import verify_database
 
 
 class OAIHarvester(object):
@@ -99,14 +99,14 @@ def main(argv=None):
     if "all" in args.provider:
         # Remove "all" from set
         providers.remove('all')
-        # Update set with all configured providers
+        # Update set with all registered providers
         providers.update([row[0]
                           for row
                           in cxn.execute('SELECT name FROM providers')
                           ])
     for provider in providers:
         if not provider.startswith('http://'):
-            # Fetch configuration from persistent storage
+            # Fetch details from provider registry
             cursor = cxn.execute('SELECT url, '
                                  'destination, '
                                  'metadataPrefix, '
@@ -119,18 +119,18 @@ def main(argv=None):
                              "".format(provider, args.databasePath))
                 continue
             baseUrl = row[0]
-            logger.info('Harvesting from configured provider {0} - {1}'
+            logger.info('Harvesting from registered provider {0} - {1}'
                         ''.format(provider, baseUrl))
             # Allow over-ride of default destination
             if args.dir is not None:
                 logger.warning('Value for command line option --dir'
-                               ' over-rides configured destination')
+                               ' over-rides registered destination')
             else:
                 args.dir = row[1]
             # Allow over-ride of default metadataPrefix
             if args.metadataPrefix is not None:
                 logger.warning('Value for command line option --metadataPrefix'
-                               ' over-rides configured value')
+                               ' over-rides registered value')
             else:
                 args.metadataPrefix = row[2]
             # Allow over-ride of stored lastHarvest time
@@ -187,17 +187,17 @@ argparser = ArgumentParser("harvest(.py)",
                            epilog='\n\n'.join(docbits[-2:]))
 argparser.add_argument('--db', '--database',
                        action='store', dest='databasePath',
-                       default=os.path.expanduser('~/.oai-harvest/config.db'),
-                       help=("Path to database used for making provider "
-                             "configurations persistent.")
+                       default=os.path.expanduser('~/.oai-harvest/registry.db'),
+                       help=("Path to provider registry database. Currently "
+                             "supports sqlite3 only.")
                        )
 argparser.add_argument('provider',
                        action='store',
                        nargs='+',
                        help=("OAI-PMH Provider from which to harvest. This may"
                              " be the base URL of an OAI-PMH server, or the "
-                             "short name of a configured provider. You may "
-                             "also specify \"all\" for all configured "
+                             "short name of a registered provider. You may "
+                             "also specify \"all\" for all registered "
                              "providers.")
                        )
 argparser.add_argument('-p', '--metadataPrefix',
