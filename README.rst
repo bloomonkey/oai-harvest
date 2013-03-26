@@ -120,6 +120,89 @@ Copyright (c) `University of Liverpool`_, 2013
 See LICENSE.rst for licensing details.
 
 
+Examples
+--------
+
+Harvesting records from an OAI-PMH provider URL
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+All records
+'''''''''''
+
+```bash
+oai-harvest http://example.com/oai
+```
+
+Records modified since a certain date
+'''''''''''''''''''''''''''''''''''''
+
+```bash
+oai-harvest --from=2013-01-01 http://example.com/oai
+```
+
+Getting help on all available options
+'''''''''''''''''''''''''''''''''''''
+
+```bash
+oai-harvest --help
+```
+
+
+OAI-PMH Provider Registry
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Adding a provider
+'''''''''''''''''
+
+```bash
+oai-reg add myprovider http://example.com/oai
+```
+
+If you don't supply the ``--metadataPrefix`` and ``--directory`` options, you
+will be interactively prompted to supply alternatives, or accept the defaults. 
+
+
+Removing an existing provider
+'''''''''''''''''''''''''''''
+
+```bash
+oai-reg rm provider1 provider2 ...
+```
+
+Listing existing providers
+''''''''''''''''''''''''''
+
+```bash
+oai-reg list
+```
+
+Harvesting from OAI-PMH providers in the registry
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+```bash
+oai-harvest myprovider [anotherprovider]
+```
+
+By default, this will harvest only those records modified since the last
+harvest from the provider. You can over-ride this behavior using the ``--from``
+and ``--until`` options.
+
+You can also harvest from all providers in the registry:
+
+```bash
+oai-harvest all
+```
+
+In order to maintain a reasonably up-to-date copy of all the the records held
+by those providers, one could configure a scheduler to periodically harvest
+from all registered providers. e.g. to tell CRON to harvest all at 2am every
+day, one might add the following to crontab:
+
+```
+0 2 * * * oai-harvest all
+```
+
+
 .. Links
 .. _Python: http://www.python.org/
 .. _WSGI: http://wsgi.org
