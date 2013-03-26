@@ -47,6 +47,12 @@ setup(
     requires=['lxml(>=2.1)', 'pyoai(>=2.4)'],
     install_requires=_install_requires,
     setup_requires=['setuptools-git'],
+    entry_points={
+        'console_scripts': [
+            "oai-harvest = oaiharvest.harvest:main",
+            "oai-reg = oaiharvest.registry:main"
+        ]
+    },
     url='http://github.com/bloomonkey/oai-harvest',
     license="BSD",
     classifiers=[
