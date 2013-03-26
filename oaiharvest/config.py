@@ -35,11 +35,10 @@ def add_provider(args):
         return 1
     # Try to create row now to avoid unnecessary validation if duplicate
     try:
-        with args.cxn:
-            args.cxn.execute("INSERT INTO providers(name, lastHarvest) values "
-                             "(?, ?)",
-                             (args.name, datetime.fromtimestamp(0))
-            )
+        args.cxn.execute("INSERT INTO providers(name, lastHarvest) values "
+                         "(?, ?)",
+                         (args.name, datetime.fromtimestamp(0))
+        )
     except sqlite3.IntegrityError:
         addlogger.critical('Unable to add provider "{0}"; '
                            'provider with this name already exists'
@@ -90,18 +89,17 @@ def add_provider(args):
             addlogger.info('metadataPrefix for new provider not supplied. '
                            'using default: oai_dc')
             args.metadataPrefix = 'oai_dc'
-    with args.cxn:
-        args.cxn.execute("UPDATE providers SET "
-                         "url=?, "
-                         "destination=?, "
-                         "metadataPrefix=? "
-                         "WHERE name=?",
-                         (args.url,
-                          args.dest,
-                          args.metadataPrefix,
-                          args.name
-                          )
-        )
+    args.cxn.execute("UPDATE providers SET "
+                     "url=?, "
+                     "destination=?, "
+                     "metadataPrefix=? "
+                     "WHERE name=?",
+                     (args.url,
+                      args.dest,
+                      args.metadataPrefix,
+                      args.name
+                      )
+    )
     addlogger.info('URL for next harvest: {0}?verb=ListRecords'
                    '&metadataPrefix={1}'
                    '&from={2:%Y-%m-%dT%H:%M:%SZ%z}'
@@ -110,6 +108,8 @@ def add_provider(args):
                              datetime.fromtimestamp(0)
                              )
                    )
+    # All done, commit database
+    args.cxn.commit()
     return 0
 
 
