@@ -1,14 +1,23 @@
 # encoding: utf-8
 """Harvest records from an OAI-PMH provider.
 
+usage: %prog [-h] [--db DATABASEPATH] [-p METADATAPREFIX] [-f YYYY-MM-DD]
+             [-u YYYY-MM-DD] [-d DIR] provider [provider ...]
+
 positional arguments:
-  provider              OAI-PMH Provider from which to harvest.
+  provider              OAI-PMH Provider from which to harvest. This may be
+                        the base URL of an OAI-PMH server, or the short name
+                        of a registered provider. You may also specify "all"
+                        for all registered providers.
 
 optional arguments:
   -h, --help            show this help message and exit
+  --db DATABASEPATH, --database DATABASEPATH
+                        Path to provider registry database. Currently supports
+                        sqlite3 only.
   -p METADATAPREFIX, --metadataPrefix METADATAPREFIX
-                        where to output files for harvested records. default
-                        is current working path
+                        the metadataPrefix of the format (XML Schema) in which
+                        records should be harvested.
   -f YYYY-MM-DD, --from YYYY-MM-DD
                         harvest only records added/modified after this date.
   -u YYYY-MM-DD, --until YYYY-MM-DD
@@ -39,11 +48,17 @@ from registry import verify_database
 
 
 class OAIHarvester(object):
+    """Abstract Base Class for an OAI-PMH Harvester.
+    
+    Should be sub-classed in order to do useful things with the harvested
+    records (e.g. put them in a directory, VCS repository, local database etc.
+    """
 
     def __init__(self, mdRegistry):
         self._mdRegistry = mdRegistry
     
     def _listRecords(self, baseUrl, metadataPrefix="oai_dc", **kwargs):
+        # Generator to yield records from baseUrl in the given metadataPrefix
         # Add metatdataPrefix to args
         kwargs['metadataPrefix'] = metadataPrefix
         client = Client(baseUrl, metadata_registry)
@@ -58,12 +73,17 @@ class OAIHarvester(object):
 
 
 class DirectoryOAIHarvester(OAIHarvester):
+    """OAI-PMH Harvester to output harvested records to files in a directory.
+    
+    Directory to output files to is specified at object init/construction time.
+    """
     
     def __init__(self, mdRegistry, directory):
         OAIHarvester.__init__(self, mdRegistry)
         self._dir = directory
 
     def harvest(self, baseUrl, metadataPrefix, **kwargs):
+        """Harvest records, output records to files in the directory."""
         logger = logging.getLogger(__name__).getChild(self.__class__.__name__)
         for header, metadata, about in self._listRecords(
                  baseUrl,
@@ -79,7 +99,7 @@ class DirectoryOAIHarvester(OAIHarvester):
 
 
 def main(argv=None):
-    '''Command line options.'''
+    """Process command line arguments, harvest records accordingly."""
     global argparser, metadata_registry
     if argv is None:
         args = argparser.parse_args()
@@ -182,8 +202,7 @@ def main(argv=None):
 # Set up argument parser
 docbits = __doc__.split('\n\n')
 
-argparser = ArgumentParser("harvest(.py)",
-                           description=docbits[0],
+argparser = ArgumentParser(description=docbits[0],
                            epilog='\n\n'.join(docbits[-2:]))
 argparser.add_argument('--db', '--database',
                        action='store', dest='databasePath',

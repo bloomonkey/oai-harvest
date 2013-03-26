@@ -1,5 +1,26 @@
 # encoding: utf-8
-"""Manage registry of OAI-PMH providers."""
+"""Manage registry of OAI-PMH providers.
+
+usage: oai-reg [-h] [-d DATABASEPATH] {add,rm,list} ...
+
+positional arguments:
+  {add,rm,list}         Actions
+    add                 Add a new OAI-PMH provider
+    rm                  Remove a registered OAI-PMH provider
+    list                List registered OAI-PMH provider
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -d DATABASEPATH, --database DATABASEPATH
+                        Path to provider registry database. Currently supports
+                        sqlite3 only.
+
+Copyright © 2013, the University of Liverpool <http://www.liv.ac.uk>. All
+rights reserved.
+
+Distributed under the terms of the BSD 3-clause License
+<http://opensource.org/licenses/BSD-3-Clause>.
+"""
 
 import logging
 import os
@@ -20,6 +41,14 @@ MAX_NAME_LENGTH = 15
 
 
 def add_provider(cxn, args):
+    """Add a new provider to the registry database.
+    
+    Process ``args`` to add a new provider to the registry database. Return 0
+    for success, 1 for failure (error message should be logged).
+    
+    ``cxn`` => instance of ``sqlite3.Connection``
+    ``args`` => instance of ``argparse.Namespace``
+    """
     global logger, MAX_NAME_LENGTH
     addlogger = logger.getChild('add')
     # Validate name
@@ -112,6 +141,14 @@ def add_provider(cxn, args):
 
 
 def rm_provider(cxn, args):
+    """Remove existing provider(s) from the registry database.
+    
+    Process ``args`` to remove provider(s) to the registry database. Return 0
+    for success, 1 for failure (error message should be logged).
+    
+    ``cxn`` => instance of ``sqlite3.Connection``
+    ``args`` => instance of ``argparse.Namespace``
+    """
     global logger
     rmlogger = logger.getChild('remove')
     for name in args.name:
@@ -130,6 +167,14 @@ def rm_provider(cxn, args):
 
 
 def list_providers(cxn, args):
+    """List provider(s) currently in the registry database.
+    
+    Process ``args`` to remove provider(s) to the registry database. Return 0
+    for success, 1 for failure (error message should be logged).
+    
+    ``cxn`` => instance of ``sqlite3.Connection``
+    ``args`` => instance of ``argparse.Namespace``
+    """
     global logger, MAX_NAME_LENGTH
     listlogger = logger.getChild('remove')
     if args.url:
@@ -172,7 +217,8 @@ def verify_database(path):
             detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES
         )
     except sqlite3.OperationalError:
-        var_logger.critical('Database file "{0}" does not exist'.format(path))
+        var_logger.critical('Database file "{0}" does not exist and cannot be '
+                            'created'.format(path))
         return 1
     # Verify that table exists
     try:
@@ -192,7 +238,7 @@ def verify_database(path):
 
 
 def main(argv=None):
-    '''Command line options.'''
+    '''Process command line options, hand off to appropriate function.'''
     global argparser, connection, logger
     if argv is None:
         args = argparser.parse_args()
