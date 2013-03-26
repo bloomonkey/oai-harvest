@@ -117,7 +117,7 @@ Copyright & Licensing
 
 Copyright (c) `University of Liverpool`_, 2013
 
-See LICENSE.rst for licensing details.
+See `LICENSE.rst <LICENSE.rst>`_ for licensing details.
 
 
 Examples
