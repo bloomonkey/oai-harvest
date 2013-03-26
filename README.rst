@@ -13,7 +13,7 @@ Contents
 - `Requirements / Dependencies`_
 - `Installation`_
 - `Bugs, Feature requests etc.`_
-- `Copyright & Licensing`_
+- `Copyright And Licensing`_
 - `Examples`_
 
 
@@ -112,8 +112,8 @@ If you'd like to contribute code, patches etc. please email the author, or
 submit a pull request on GitHub.
 
 
-Copyright & Licensing
----------------------
+Copyright And Licensing
+-----------------------
 
 Copyright (c) `University of Liverpool`_, 2013
 
