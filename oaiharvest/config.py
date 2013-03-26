@@ -21,7 +21,7 @@ from urllib2 import HTTPError
 MAX_NAME_LENGTH = 15
 
 
-def add_provider(args):
+def add_provider(cxn, args):
     global logger, MAX_NAME_LENGTH
     addlogger = logger.getChild('add')
     # Validate name
@@ -35,7 +35,7 @@ def add_provider(args):
         return 1
     # Try to create row now to avoid unnecessary validation if duplicate
     try:
-        args.cxn.execute("INSERT INTO providers(name, lastHarvest) values "
+        cxn.execute("INSERT INTO providers(name, lastHarvest) values "
                          "(?, ?)",
                          (args.name, datetime.fromtimestamp(0))
         )
@@ -89,7 +89,7 @@ def add_provider(args):
             addlogger.info('metadataPrefix for new provider not supplied. '
                            'using default: oai_dc')
             args.metadataPrefix = 'oai_dc'
-    args.cxn.execute("UPDATE providers SET "
+    cxn.execute("UPDATE providers SET "
                      "url=?, "
                      "destination=?, "
                      "metadataPrefix=? "
@@ -109,16 +109,16 @@ def add_provider(args):
                              )
                    )
     # All done, commit database
-    args.cxn.commit()
+    cxn.commit()
     return 0
 
 
-def rm_provider(args):
+def rm_provider(cxn, args):
     global logger
     rmlogger = logger.getChild('remove')
     for name in args.name:
-        with args.cxn:
-            cur = args.cxn.execute(
+        with cxn:
+            cur = cxn.execute(
                                    "DELETE FROM providers WHERE name=?",
                                    (name,)
                                    )
@@ -131,7 +131,7 @@ def rm_provider(args):
     return 0
 
 
-def list_providers(args):
+def list_providers(cxn, args):
     global logger, MAX_NAME_LENGTH
     listlogger = logger.getChild('remove')
     if args.url:
@@ -153,7 +153,7 @@ def list_providers(args):
                "metadataPrefix || '&from=' || lastHarvest "
                "FROM providers")
         label = 'URL for next harvest'
-    cursor = args.cxn.execute(sql)
+    cursor = cxn.execute(sql)
     sys.stdout.write(''.join(['name'.ljust(MAX_NAME_LENGTH + 1),
                               label, '\n']))
     sys.stdout.write(' '.join(['=' * MAX_NAME_LENGTH, '=' * len(label), '\n']))
@@ -203,8 +203,8 @@ def main(argv=None):
     cxn = verify_database(args.databasePath)
     if not isinstance(cxn, sqlite3.Connection):
         return cxn
-    args.cxn = cxn
-    return args.func(args)
+    cxn = cxn
+    return args.func(cxn, args)
 
 
 # Set up argument parser
