@@ -1,5 +1,5 @@
-OAI Harvest
-===========
+OAI-PMH Harvest
+===============
 
 26th March 2013 (2013-03-26)
 
@@ -157,8 +157,8 @@ Adding a provider
    oai-reg add provider1 http://example.com/oai/1
 
 
-If you don't supply the ``--metadataPrefix`` and ``--directory`` options, you
-will be interactively prompted to supply alternatives, or accept the defaults. 
+If you don't supply ``--metadataPrefix`` and ``--directory`` options, you will
+be interactively prompted to supply alternatives, or accept the defaults.
 
 
 Removing an existing provider
@@ -177,21 +177,24 @@ Listing existing providers
 
 Harvesting from OAI-PMH providers in the registry
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-::
+
+You can harvest from one or more providers in the registry using the short
+names that they were registered with::
 
    oai-harvest provider1 [provider2]
 
 
-By default, this will harvest only those records modified since the last
-harvest from the provider. You can over-ride this behavior using the ``--from``
-and ``--until`` options.
+By default, this will harvest all records modified since the last harvest from
+each provider. You can over-ride this behavior using the ``--from`` and
+``--until`` options.
 
-You can also harvest from all providers in the registry:
-
-::
+You can also harvest from all providers in the registry::
 
    oai-harvest all
 
+
+Scheduling Regular Harvesting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In order to maintain a reasonably up-to-date copy of all the the records held
 by those providers, one could configure a scheduler to periodically harvest
@@ -204,8 +207,6 @@ day, one might add the following to crontab::
 
 .. Links
 .. _Python: http://www.python.org/
-.. _WSGI: http://wsgi.org
-.. _`Encoded Archival Description`: http://www.loc.gov/ead/
 .. _`University of Liverpool`: http://www.liv.ac.uk
 .. _GitHub: http://github.com
 .. _virtualenv: http://www.virtualenv.org/en/latest/
