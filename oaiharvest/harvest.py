@@ -160,14 +160,6 @@ def main(argv=None):
                                ' over-rides recorded lastHarvest timestamp')
             else:
                 args.from_ = row[3]
-            # Update database with lastHarvest time now
-            # The first request might create a snapshot of the data on the
-            # provider server in order for resumption tokens to work correctly.
-            # Any records added after this snapshot, but before completion of
-            # harvesting should be included in next harvest.
-            with cxn:
-                cxn.execute("UPDATE providers SET lastHarvest=? WHERE name=?",
-                            (datetime.now(), provider))
         else:
             baseUrl = provider
             logger.info('Harvesting from {0}'.format(baseUrl))
@@ -180,6 +172,12 @@ def main(argv=None):
         # Init harvester object
         harvester = DirectoryOAIHarvester(metadata_registry,
                                           os.path.abspath(args.dir))
+        # Generate harvest time now
+        # The first request might create a snapshot of the data on the
+        # provider server in order for resumption tokens to work correctly.
+        # Any records added after this snapshot, but before completion of
+        # harvesting should be included in next harvest.
+        harvestTime = datetime.now()
         try:
             harvester.harvest(baseUrl,
                               args.metadataPrefix,
@@ -196,8 +194,16 @@ def main(argv=None):
                                    args.until,
                                    args.metadataPrefix)
                          )
+        except Exception as e:
+            # Log error
+            logger.error(str(e))
+            # Continue to next provide without updating database lastHarvest
             continue
 
+        # Update lastHarsest time for registered provider
+        with cxn:
+            cxn.execute("UPDATE providers SET lastHarvest=? WHERE name=?",
+                        (harvestTime, provider))
 
 # Set up argument parser
 docbits = __doc__.split('\n\n')
