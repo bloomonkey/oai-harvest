@@ -80,7 +80,7 @@ class DirectoryOAIHarvester(OAIHarvester):
     
     def __init__(self, mdRegistry, directory):
         OAIHarvester.__init__(self, mdRegistry)
-        self._dir = directory
+        self._dir = os.path.abspath(directory)
 
     def harvest(self, baseUrl, metadataPrefix, **kwargs):
         """Harvest records, output records to files in the directory."""
