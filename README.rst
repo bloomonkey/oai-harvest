@@ -1,7 +1,8 @@
 OAI-PMH Harvest
 ===============
 
-27th March 2013 (2013-03-27)
+15th April 2013 (2013-04-15)
+
 
 Contents
 --------
@@ -9,9 +10,10 @@ Contents
 - `Description`_
 - `Author(s)`_
 - `Latest Version`_
-- `Documentation`_
 - `Requirements / Dependencies`_
 - `Installation`_
+- `Documentation`_
+- `Roadmap`_
 - `Bugs, Feature requests etc.`_
 - `Copyright And Licensing`_
 - `Examples`_
@@ -49,27 +51,19 @@ John Harrison <john.harrison@liv.ac.uk> at the `University of Liverpool`_
 Latest Version
 --------------
 
+
 This is a pre-release repository of the code. There are no discrete version
 numbers as yet. Source code is under version control and available from:
 http://github.com/bloomonkey/oai-harvest
 
 
-Documentation
--------------
-
-All executable commands are self documenting, i.e. you can get help on how to
-use them with the ``-h`` or ``--help`` option.
-
-At this time the only additional documentation that exists can be found in this
-README file!
-
-
 Requirements / Dependencies
 ---------------------------
 
-- Python 2.6+
-- pyoai
-- lxml
+- Python_ >= 2.6
+- pyoai_
+- lxml_
+- sqlite3_
 
 
 Installation
@@ -100,6 +94,44 @@ from system Python_ and any packages that may be installed there.
 4. Install in develop / editable mode:
 
    ``pip install -e .``
+
+
+Documentation
+-------------
+
+All executable commands are self documenting, i.e. you can get help on how to
+use them with the ``-h`` or ``--help`` option.
+
+At this time the only additional documentation that exists can be found in this
+README file!
+
+
+Roadmap
+-------
+
+**Version 1.0 – April 2013**
+
+- Harvest from a given URL
+
+- Selective harvesting by modification date
+
+- Facilitate regular harvesting from 1 or more providers
+
+  - Register parameters - e.g. URL, Schema (metadataPrefix), target directory -
+    for regular harvesting from a named provider
+
+  - Specify provider using registered name when harvesting, or harvest from all
+    registered providers using the reserved name `all`
+
+  - Harvest only records modified since last harvest (unless overridden)
+
+
+**Version 1.1 - May 2013**
+
+- Selective harvesting by set
+
+- Limit harvesting to an arbitrary number of records (e.g. to avoid throttling
+  / blacklisting by provider server)
 
 
 Bugs, Feature requests etc.
@@ -204,9 +236,11 @@ day, one might add the following to crontab::
    0 2 * * * oai-harvest all
 
 
-
 .. Links
 .. _Python: http://www.python.org/
+.. _pyoai: https://pypi.python.org/pypi/pyoai
+.. _lxml: https://pypi.python.org/pypi/lxml
+.. _sqlite3: http://www.sqlite.org/
 .. _`University of Liverpool`: http://www.liv.ac.uk
 .. _GitHub: http://github.com
 .. _virtualenv: http://www.virtualenv.org/en/latest/
