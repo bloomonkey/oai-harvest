@@ -95,7 +95,10 @@ def add_provider(cxn, args):
     # Destination
     if args.dest is None:
         args.dest = raw_input('Destination directory: '.ljust(20))
-        if not args.dest:
+        if args.dest:
+            # Expand user dir
+            args.dest = os.path.expanduser(args.dest)
+        else:
             addlogger.info('Destination for data for new provider not supplied'
                            ' using default `pwd`: {0}'.format(os.getcwd())
                            )

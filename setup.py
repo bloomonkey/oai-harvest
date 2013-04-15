@@ -14,7 +14,7 @@ py_version = getattr(sys, 'version_info', (0, 0, 0))
 
 # Basic information
 _name = "oaiharvest"
-_version = "0.1"
+_version = "1.0"
 _description = ("A harvester to collect records from an OAI-PMH enabled "
                 "provider.")
 _author = 'John Harrison'
@@ -44,7 +44,8 @@ setup(
     maintainer=_author,
     maintainer_email=_author_email,
     include_package_data=True,
-    exclude_package_data={'': ['README.*', '.gitignore']},
+    exclude_package_data={'': ['README.*', 'LICENSE.*',
+                               'requirements.txt', '.gitignore']},
     requires=['lxml(>=2.1)', 'pyoai(>=2.4)'],
     install_requires=_install_requires,
     setup_requires=['setuptools-git'],
