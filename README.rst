@@ -1,7 +1,7 @@
 OAI-PMH Harvest
 ===============
 
-15th April 2013 (2013-04-15)
+9th May 2013 (2013-05-09)
 
 
 Contents
@@ -114,7 +114,9 @@ Installation
 Users
 ~~~~~
 
-``pip install git+http://github.com/bloomonkey/oai-harvest.git#egg=oaiharvest``
+::
+
+    pip install git+http://github.com/bloomonkey/oai-harvest.git#egg=oaiharvest
 
 
 Developers
@@ -125,17 +127,17 @@ from system Python_ and any packages that may be installed there.
 
 1. In GitHub_, fork the repository
 
-2. Clone your fork:
+2. Clone your fork::
 
-   ``git clone git@github.com:<username>/oai-harvest.git``
+       git clone git@github.com:<username>/oai-harvest.git
 
-3. Install dependencies:
+3. Install dependencies::
 
-   ``pip install -r requirements.txt``
+       pip install -r requirements.txt
 
-4. Install in develop / editable mode:
+4. Install in develop / editable mode::
 
-   ``pip install -e .``
+       pip install -e .
 
 
 Bugs, Feature requests etc.
@@ -164,6 +166,7 @@ Harvesting records from an OAI-PMH provider URL
 
 All records
 '''''''''''
+
 ::
 
    oai-harvest http://example.com/oai
@@ -171,6 +174,7 @@ All records
 
 Records modified since a certain date
 '''''''''''''''''''''''''''''''''''''
+
 ::
 
    oai-harvest --from 2013-01-01 http://example.com/oai
@@ -178,6 +182,7 @@ Records modified since a certain date
 
 Getting help on all available options
 '''''''''''''''''''''''''''''''''''''
+
 ::
 
    oai-harvest --help
@@ -188,6 +193,7 @@ OAI-PMH Provider Registry
 
 Adding a provider
 '''''''''''''''''
+
 ::
 
    oai-reg add provider1 http://example.com/oai/1
@@ -199,6 +205,7 @@ be interactively prompted to supply alternatives, or accept the defaults.
 
 Removing an existing provider
 '''''''''''''''''''''''''''''
+
 ::
 
    oai-reg rm provider1 [provider2]
@@ -206,6 +213,7 @@ Removing an existing provider
 
 Listing existing providers
 ''''''''''''''''''''''''''
+
 ::
 
    oai-reg list
