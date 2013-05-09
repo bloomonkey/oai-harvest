@@ -180,6 +180,14 @@ Records modified since a certain date
    oai-harvest --from 2013-01-01 http://example.com/oai
 
 
+Records from a named set
+''''''''''''''''''''''''
+
+::
+
+   oai-harvest --set "some:set" http://example.com/oai
+
+
 Getting help on all available options
 '''''''''''''''''''''''''''''''''''''
 
