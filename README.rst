@@ -188,6 +188,14 @@ Records from a named set
    oai-harvest --set "some:set" http://example.com/oai
 
 
+Limiting the number of records to harvest
+'''''''''''''''''''''''''''''''''''''''''
+
+::
+
+   oai-harvest --limit 50 http://example.com/oai
+
+
 Getting help on all available options
 '''''''''''''''''''''''''''''''''''''
 
