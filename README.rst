@@ -10,6 +10,8 @@ Contents
 - `Description`_
 - `Author(s)`_
 - `Latest Version`_
+  - `Roadmap`_
+- `Documentation`_
 - `Requirements / Dependencies`_
 - `Installation`_
 - `Documentation`_
@@ -57,6 +59,46 @@ numbers as yet. Source code is under version control and available from:
 http://github.com/bloomonkey/oai-harvest
 
 
+Roadmap
+~~~~~~~
+
+**Version 1.0 – April 2013**
+
+- Harvest from a given URL
+
+- Selective harvesting by modification date
+
+- Facilitate regular harvesting from 1 or more providers
+
+  - Register parameters - e.g. URL, Schema (metadataPrefix), target directory -
+    for regular harvesting from a named provider
+    
+  - Specify provider using registered name when harvesting, or harvest from all
+    registered providers using the reserved name `all` 
+    
+  - Harvest only records modified since last harvest (unless overridden)
+
+
+**Version 1.1 - May 2013**
+
+- Sensible handling of deletions
+
+- Selective harvesting by set
+
+- Limit harvesting to an arbitrary number of records (e.g. to avoid throttling 
+  / blacklisting by provider server)
+
+
+Documentation
+-------------
+
+All executable commands are self documenting, i.e. you can get help on how to
+use them with the ``-h`` or ``--help`` option.
+
+At this time the only additional documentation that exists can be found in this
+README file!
+
+
 Requirements / Dependencies
 ---------------------------
 
@@ -94,44 +136,6 @@ from system Python_ and any packages that may be installed there.
 4. Install in develop / editable mode:
 
    ``pip install -e .``
-
-
-Documentation
--------------
-
-All executable commands are self documenting, i.e. you can get help on how to
-use them with the ``-h`` or ``--help`` option.
-
-At this time the only additional documentation that exists can be found in this
-README file!
-
-
-Roadmap
--------
-
-**Version 1.0 – April 2013**
-
-- Harvest from a given URL
-
-- Selective harvesting by modification date
-
-- Facilitate regular harvesting from 1 or more providers
-
-  - Register parameters - e.g. URL, Schema (metadataPrefix), target directory -
-    for regular harvesting from a named provider
-
-  - Specify provider using registered name when harvesting, or harvest from all
-    registered providers using the reserved name `all`
-
-  - Harvest only records modified since last harvest (unless overridden)
-
-
-**Version 1.1 - May 2013**
-
-- Selective harvesting by set
-
-- Limit harvesting to an arbitrary number of records (e.g. to avoid throttling
-  / blacklisting by provider server)
 
 
 Bugs, Feature requests etc.
