@@ -179,12 +179,20 @@ def main(argv=None):
         # Any records added after this snapshot, but before completion of
         # harvesting should be included in next harvest.
         harvestTime = datetime.now()
+        # Create a dictionary of keyword args
+        # Avoid sending kwargs with value of None - e.g. set=None causes
+        # error on servers that don't support set hierarchy.
+        kwargs = {}
+        if args.from_ is not None:
+            kwargs['from_'] = args.from_
+        if args.until is not None:
+            kwargs['until'] = args.until
+        if args.set is not None:
+            kwargs['set'] = args.set
         try:
             harvester.harvest(baseUrl,
                               args.metadataPrefix,
-                              from_=args.from_,
-                              until=args.until,
-                              set=args.set
+                              **kwargs
                               )
         except NoRecordsMatchError:
             # Nothing to harvest
