@@ -91,13 +91,13 @@ class DirectoryOAIHarvester(OAIHarvester):
                  metadataPrefix=metadataPrefix,
                  **kwargs):
             if not header.isDeleted():
-              fp =  os.path.join(self._dir,
-                                 "{0}.{1}.xml".format(header.identifier(),
-                                                      metadataPrefix)
-                                 )
-              logger.debug('Writing to file {0}'.format(fp))
-              with open(fp, 'w') as fh:
-                  fh.write(metadata)
+                fp =  os.path.join(self._dir,
+                                   "{0}.{1}.xml".format(header.identifier(),
+                                                        metadataPrefix)
+                                   )
+                logger.debug('Writing to file {0}'.format(fp))
+                with open(fp, 'w') as fh:
+                    fh.write(metadata)
 
 
 def main(argv=None):
