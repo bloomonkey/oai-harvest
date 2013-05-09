@@ -79,9 +79,10 @@ class DirectoryOAIHarvester(OAIHarvester):
     Directory to output files to is specified at object init/construction time.
     """
     
-    def __init__(self, mdRegistry, directory):
+    def __init__(self, mdRegistry, directory, respectDeletions=True):
         OAIHarvester.__init__(self, mdRegistry)
         self._dir = os.path.abspath(directory)
+        self.respectDeletions = respectDeletions
 
     def harvest(self, baseUrl, metadataPrefix, **kwargs):
         """Harvest records, output records to files in the directory."""
@@ -94,9 +95,23 @@ class DirectoryOAIHarvester(OAIHarvester):
                                "{0}.{1}.xml".format(header.identifier(),
                                                     metadataPrefix)
                                )
-            logger.debug('Writing to file {0}'.format(fp))
-            with open(fp, 'w') as fh:
-                fh.write(metadata)
+            if not header.isDeleted():
+                logger.debug('Writing to file {0}'.format(fp))
+                with open(fp, 'w') as fh:
+                    fh.write(metadata)
+            else:
+                if self.respectDeletions:
+                    logger.debug("Respecting server request to delete file {0}"
+                                "".format(fp))
+                    try:
+                        os.remove(fp)
+                    except OSError:
+                        # File probably does't exist in destination directory
+                        # No further action needed
+                        pass
+                else:
+                    logger.debug("Ignoring server request to delete file {0}"
+                                "".format(fp))
 
 
 def main(argv=None):
@@ -172,7 +187,9 @@ def main(argv=None):
 
         # Init harvester object
         harvester = DirectoryOAIHarvester(metadata_registry,
-                                          os.path.abspath(args.dir))
+                                          os.path.abspath(args.dir),
+                                          respectDeletions=args.deletions
+                                          )
         # Generate harvest time now
         # The first request might create a snapshot of the data on the
         # provider server in order for resumption tokens to work correctly.
@@ -208,6 +225,7 @@ def main(argv=None):
             # Log error
             logger.error(str(e))
             # Continue to next provide without updating database lastHarvest
+            raise
             continue
 
         # Update lastHarsest time for registered provider
@@ -264,6 +282,23 @@ group.add_argument('-d', '--dir',
                    default=None,
                    help=("where to output files for harvested records."
                          "default: current working path")
+                   )
+# What to do about deletions
+group = argparser.add_mutually_exclusive_group()
+group.set_defaults(deletions=True)
+group.add_argument("--delete",
+                   action='store_const',
+                   dest='deletions',
+                   const=True,
+                   help=("Respect the server's instructions regarding "
+                         "deletions, i.e. delete the files locally (default)")
+                   )
+group.add_argument("--no-delete",
+                   action='store_const',
+                   dest='deletions',
+                   const=False,
+                   help=("Ignore the server's instructions regarding "
+                         "deletions, i.e. DO NOT delete the files locally")
                    )
 
 # Set up metadata registry
