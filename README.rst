@@ -3,7 +3,6 @@ OAI-PMH Harvest
 
 9th May 2013 (2013-05-09)
 
-
 Contents
 --------
 
@@ -54,6 +53,16 @@ Latest Version
 The latest release version is available in the Python Packages Index:
 
 https://pypi.python.org/pypi/oaiharvest
+
+.. image:: https://pypip.in/v/oaiharvest/badge.png
+    :target: https://crate.io/packages/oaiharvest/
+    :alt: Latest PyPI version
+
+.. image:: https://pypip.in/d/oaiharvest/badge.png
+    :target: https://crate.io/packages/oaiharvest/
+    :alt: Number of PyPI downloads
+
+
 
 Source code is under version control and available from:
 
