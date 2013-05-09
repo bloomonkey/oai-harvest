@@ -10,12 +10,9 @@ Contents
 - `Description`_
 - `Author(s)`_
 - `Latest Version`_
-  - `Roadmap`_
 - `Documentation`_
 - `Requirements / Dependencies`_
 - `Installation`_
-- `Documentation`_
-- `Roadmap`_
 - `Bugs, Feature requests etc.`_
 - `Copyright And Licensing`_
 - `Examples`_
@@ -53,50 +50,23 @@ John Harrison <john.harrison@liv.ac.uk> at the `University of Liverpool`_
 Latest Version
 --------------
 
+The latest release version is available in PyPI_:
 
-This is a pre-release repository of the code. There are no discrete version
-numbers as yet. Source code is under version control and available from:
+https://pypi.python.org/pypi/oaiharvest
+
+Source code is under version control and available from:
+
 http://github.com/bloomonkey/oai-harvest
-
-
-Roadmap
-~~~~~~~
-
-**Version 1.0 – April 2013**
-
-- Harvest from a given URL
-
-- Selective harvesting by modification date
-
-- Facilitate regular harvesting from 1 or more providers
-
-  - Register parameters - e.g. URL, Schema (metadataPrefix), target directory -
-    for regular harvesting from a named provider
-    
-  - Specify provider using registered name when harvesting, or harvest from all
-    registered providers using the reserved name `all` 
-    
-  - Harvest only records modified since last harvest (unless overridden)
-
-
-**Version 1.1 - May 2013**
-
-- Sensible handling of deletions
-
-- Selective harvesting by set
-
-- Limit harvesting to an arbitrary number of records (e.g. to avoid throttling 
-  / blacklisting by provider server)
 
 
 Documentation
 -------------
 
-All executable commands are self documenting, i.e. you can get help on how to
-use them with the ``-h`` or ``--help`` option.
+All executable commands are self documenting, i.e. you can get help on
+how to use them with the ``-h`` or ``--help`` option.
 
-At this time the only additional documentation that exists can be found in this
-README file!
+At this time the only additional documentation that exists can be found
+in this README file!
 
 
 Requirements / Dependencies
@@ -267,6 +237,7 @@ day, one might add the following to crontab::
 .. Links
 .. _Python: http://www.python.org/
 .. _pyoai: https://pypi.python.org/pypi/pyoai
+.. _PyPI: https://pypi.python.org/pypi
 .. _lxml: https://pypi.python.org/pypi/lxml
 .. _sqlite3: http://www.sqlite.org/
 .. _`University of Liverpool`: http://www.liv.ac.uk
