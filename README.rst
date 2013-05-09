@@ -23,22 +23,23 @@ Description
 
 A harvester to collect records from an OAI-PMH enabled provider.
 
-The harvester can be used to carry out one-time harvesting of all records from
-a particular OAI-PMH provider by giving its base URL. It can also be used for
-selective harvesting, e.g. to harvest only records updated after, or before 
-specified dates.
+The harvester can be used to carry out one-time harvesting of all
+records from a particular OAI-PMH provider by giving its base URL. It
+can also be used for selective harvesting, e.g. to harvest only records
+updated after, or before specified dates.
 
-To assist in regular harvesting from one or more OAI-PMH providers, there's
-a provider registry. It is possible to associate a short memorable name for a
-provider with its base URLs, destination directory for harvested records, and
-the format (metadataPrefix) in which records should be harvested. The registry
-will also record the date and time of the most recent harvest, and
-automatically add this to subsequent requests in order to avoid repeatedly
-harvesting unmodified records.
+To assist in regular harvesting from one or more OAI-PMH providers,
+there's a provider registry. It is possible to associate a short
+memorable name for a provider with its base URLs, destination directory
+for harvested records, and the format (metadataPrefix) in which records
+should be harvested. The registry will also record the date and time of
+the most recent harvest, and automatically add this to subsequent
+requests in order to avoid repeatedly harvesting unmodified records.
 
-This could be used in conjunction with a scheduler (e.g. CRON) to maintain a
-reasonably up-to-date copy of the record in one or more providers. `Examples`_
-of how to accomplish these tasks are available below. 
+This could be used in conjunction with a scheduler (e.g. CRON) to
+maintain a reasonably up-to-date copy of the record in one or more
+providers. `Examples`_ of how to accomplish these tasks are available
+below.
 
 
 Author(s)
@@ -50,7 +51,7 @@ John Harrison <john.harrison@liv.ac.uk> at the `University of Liverpool`_
 Latest Version
 --------------
 
-The latest release version is available in PyPI_:
+The latest release version is available in the Python Packages Index:
 
 https://pypi.python.org/pypi/oaiharvest
 
@@ -84,16 +85,15 @@ Installation
 Users
 ~~~~~
 
-::
-
-    pip install git+http://github.com/bloomonkey/oai-harvest.git#egg=oaiharvest
+``pip install git+http://github.com/bloomonkey/oai-harvest.git#egg=oaiharvest``
 
 
 Developers
 ~~~~~~~~~~
 
-I recommend that you use virtualenv_ to isolate your development environment
-from system Python_ and any packages that may be installed there.
+I recommend that you use virtualenv_ to isolate your development
+environment from system Python_ and any packages that may be installed
+there.
 
 1. In GitHub_, fork the repository
 
@@ -113,11 +113,12 @@ from system Python_ and any packages that may be installed there.
 Bugs, Feature requests etc.
 ---------------------------
 
-Bug reports and feature requests can be submitted to the GitHub issue tracker:
+Bug reports and feature requests can be submitted to the GitHub issue
+tracker:
 http://github.com/bloomonkey/oai-harvest/issues
 
-If you'd like to contribute code, patches etc. please email the author, or
-submit a pull request on GitHub.
+If you'd like to contribute code, patches etc. please email the author,
+or submit a pull request on GitHub.
 
 
 Copyright And Licensing
@@ -185,8 +186,9 @@ Adding a provider
    oai-reg add provider1 http://example.com/oai/1
 
 
-If you don't supply ``--metadataPrefix`` and ``--directory`` options, you will
-be interactively prompted to supply alternatives, or accept the defaults.
+If you don't supply ``--metadataPrefix`` and ``--directory`` options,
+you will be interactively prompted to supply alternatives, or accept
+the defaults.
 
 
 Removing an existing provider
@@ -208,15 +210,15 @@ Listing existing providers
 Harvesting from OAI-PMH providers in the registry
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You can harvest from one or more providers in the registry using the short
-names that they were registered with::
+You can harvest from one or more providers in the registry using the
+short names that they were registered with::
 
    oai-harvest provider1 [provider2]
 
 
-By default, this will harvest all records modified since the last harvest from
-each provider. You can over-ride this behavior using the ``--from`` and
-``--until`` options.
+By default, this will harvest all records modified since the last
+harvest from each provider. You can over-ride this behavior using the
+``--from`` and ``--until`` options.
 
 You can also harvest from all providers in the registry::
 
@@ -226,10 +228,11 @@ You can also harvest from all providers in the registry::
 Scheduling Regular Harvesting
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In order to maintain a reasonably up-to-date copy of all the the records held
-by those providers, one could configure a scheduler to periodically harvest
-from all registered providers. e.g. to tell CRON to harvest all at 2am every
-day, one might add the following to crontab::
+In order to maintain a reasonably up-to-date copy of all the the
+records held by those providers, one could configure a scheduler to
+periodically harvest from all registered providers. e.g. to tell CRON
+to harvest all at 2am every day, one might add the following to
+crontab::
 
    0 2 * * * oai-harvest all
 
