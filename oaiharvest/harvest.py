@@ -239,13 +239,12 @@ docbits = __doc__.split('\n\n')
 argparser = ArgumentParser(description=docbits[0],
                            epilog='\n\n'.join(docbits[-2:]))
 argparser.add_argument('--db', '--database',
-                       action='store', dest='databasePath',
+                       dest='databasePath',
                        default=os.path.expanduser('~/.oai-harvest/registry.db'),
                        help=("Path to provider registry database. Currently "
                              "supports sqlite3 only.")
                        )
 argparser.add_argument('provider',
-                       action='store',
                        nargs='+',
                        help=("OAI-PMH Provider from which to harvest. This may"
                              " be the base URL of an OAI-PMH server, or the "
@@ -254,32 +253,30 @@ argparser.add_argument('provider',
                              "providers.")
                        )
 argparser.add_argument('-p', '--metadataPrefix',
-                       action='store', dest='metadataPrefix',
-                       default=None,
+                       dest='metadataPrefix',
                        help=("the metadataPrefix of the format (XML Schema) "
                              "in which records should be harvested.")
                        )
-argparser.add_argument("-f", "--from", dest="from_",
-                       default=None,
+argparser.add_argument("-f", "--from",
+                       dest="from_",
                        metavar="YYYY-MM-DD",
                        help=("harvest only records added/modified after this "
                              "date.")
                        )
-argparser.add_argument("-u", "--until", dest="until",
-                       default=None,
+argparser.add_argument("-u", "--until",
+                       dest="until",
                        metavar="YYYY-MM-DD",
                        help=("harvest only records added/modified up to this "
                              "date.")
                        )
-argparser.add_argument("-s", "--set", dest="set",
-                       default=None,
+argparser.add_argument("-s", "--set",
+                       dest="set",
                        help=("harvest only records within this set")
                        )
 
 group = argparser.add_mutually_exclusive_group()
 group.add_argument('-d', '--dir',
-                   action='store', dest='dir',
-                   default=None,
+                   dest='dir',
                    help=("where to output files for harvested records."
                          "default: current working path")
                    )
@@ -287,16 +284,14 @@ group.add_argument('-d', '--dir',
 group = argparser.add_mutually_exclusive_group()
 group.set_defaults(deletions=True)
 group.add_argument("--delete",
-                   action='store_const',
+                   action='store_true',
                    dest='deletions',
-                   const=True,
                    help=("Respect the server's instructions regarding "
                          "deletions, i.e. delete the files locally (default)")
                    )
 group.add_argument("--no-delete",
-                   action='store_const',
+                   action='store_false',
                    dest='deletions',
-                   const=False,
                    help=("Ignore the server's instructions regarding "
                          "deletions, i.e. DO NOT delete the files locally")
                    )
