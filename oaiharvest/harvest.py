@@ -31,6 +31,7 @@ All rights reserved.
 Distributed under the terms of the BSD 3-clause License
 <http://opensource.org/licenses/BSD-3-Clause>.
 """
+from __future__ import with_statement
 
 import logging
 import os
