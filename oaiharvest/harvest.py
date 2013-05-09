@@ -182,7 +182,8 @@ def main(argv=None):
             harvester.harvest(baseUrl,
                               args.metadataPrefix,
                               from_=args.from_,
-                              until=args.until
+                              until=args.until,
+                              set=args.set
                               )
         except NoRecordsMatchError:
             # Nothing to harvest
@@ -242,6 +243,10 @@ argparser.add_argument("-u", "--until", dest="until",
                        metavar="YYYY-MM-DD",
                        help=("harvest only records added/modified up to this "
                              "date.")
+                       )
+argparser.add_argument("-s", "--set", dest="set",
+                       default=None,
+                       help=("harvest only records within this set")
                        )
 
 group = argparser.add_mutually_exclusive_group()
