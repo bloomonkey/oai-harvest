@@ -1,8 +1,11 @@
 # encoding: utf-8
 """Harvest records from an OAI-PMH provider.
 
-usage: %prog [-h] [--db DATABASEPATH] [-p METADATAPREFIX] [-f YYYY-MM-DD]
-             [-u YYYY-MM-DD] [-d DIR] provider [provider ...]
+usage: %prog [-h] [--db DATABASEPATH] [-p METADATAPREFIX]
+             [-f YYYY-MM-DD] [-u YYYY-MM-DD] [-s SET] [-d DIR]
+             [--delete | --no-delete]
+             [-l LIMIT]
+             provider [provider ...]
 
 positional arguments:
   provider              OAI-PMH Provider from which to harvest. This may be
@@ -22,8 +25,16 @@ optional arguments:
                         harvest only records added/modified after this date.
   -u YYYY-MM-DD, --until YYYY-MM-DD
                         harvest only records added/modified up to this date.
+  -s SET, --set SET     harvest only records within this set
   -d DIR, --dir DIR     where to output files for harvested records.default:
                         current working path
+  --delete              respect the server's instructions regarding deletions,
+                        i.e. delete the files locally (default)
+  --no-delete           ignore the server's instructions regarding deletions,
+                        i.e. DO NOT delete the files locally
+  -l LIMIT, --limit LIMIT
+                        place a limit on the number of records to harvest from
+                        each provider
 
 Copyright © 2013, the University of Liverpool <http://www.liv.ac.uk>.
 All rights reserved.
@@ -79,18 +90,25 @@ class DirectoryOAIHarvester(OAIHarvester):
     Directory to output files to is specified at object init/construction time.
     """
     
-    def __init__(self, mdRegistry, directory, respectDeletions=True):
+    def __init__(self, mdRegistry, directory,
+                 respectDeletions=True, nRecs=0):
         OAIHarvester.__init__(self, mdRegistry)
         self._dir = os.path.abspath(directory)
         self.respectDeletions = respectDeletions
+        self.nRecs = nRecs
 
     def harvest(self, baseUrl, metadataPrefix, **kwargs):
         """Harvest records, output records to files in the directory."""
         logger = logging.getLogger(__name__).getChild(self.__class__.__name__)
+        i = 0
         for header, metadata, about in self._listRecords(
                  baseUrl,
                  metadataPrefix=metadataPrefix,
                  **kwargs):
+            if self.nRecs and self.nRecs > 0 and self.nRecs <= i:
+                logger.info("Stopping harvest; set limit of {0} has been "
+                            "reached".format(self.nRecs))
+                break
             fp =  os.path.join(self._dir,
                                "{0}.{1}.xml".format(header.identifier(),
                                                     metadataPrefix)
@@ -99,6 +117,7 @@ class DirectoryOAIHarvester(OAIHarvester):
                 logger.debug('Writing to file {0}'.format(fp))
                 with open(fp, 'w') as fh:
                     fh.write(metadata)
+                i += 1
             else:
                 if self.respectDeletions:
                     logger.debug("Respecting server request to delete file {0}"
@@ -188,7 +207,8 @@ def main(argv=None):
         # Init harvester object
         harvester = DirectoryOAIHarvester(metadata_registry,
                                           os.path.abspath(args.dir),
-                                          respectDeletions=args.deletions
+                                          respectDeletions=args.deletions,
+                                          nRecs=args.limit
                                           )
         # Generate harvest time now
         # The first request might create a snapshot of the data on the
@@ -286,15 +306,21 @@ group.set_defaults(deletions=True)
 group.add_argument("--delete",
                    action='store_true',
                    dest='deletions',
-                   help=("Respect the server's instructions regarding "
+                   help=("respect the server's instructions regarding "
                          "deletions, i.e. delete the files locally (default)")
                    )
 group.add_argument("--no-delete",
                    action='store_false',
                    dest='deletions',
-                   help=("Ignore the server's instructions regarding "
+                   help=("ignore the server's instructions regarding "
                          "deletions, i.e. DO NOT delete the files locally")
                    )
+argparser.add_argument("-l", "--limit",
+                       dest="limit",
+                       type=int,
+                       help=("place a limit on the number of records to "
+                             "harvest from each provider")
+                       )
 
 # Set up metadata registry
 xmlReader = XMLMetadataReader()
