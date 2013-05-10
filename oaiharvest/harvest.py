@@ -52,7 +52,6 @@ from argparse import ArgumentParser
 from datetime import datetime
 
 from oaipmh.client import Client
-from oaipmh.metadata import MetadataRegistry, oai_dc_reader
 from oaipmh.error import NoRecordsMatchError
 
 from metadata import DefaultingMetadataRegistry, XMLMetadataReader
