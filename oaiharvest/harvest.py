@@ -245,10 +245,9 @@ def main(argv=None):
             # Log error
             logger.error(str(e))
             # Continue to next provide without updating database lastHarvest
-            raise
             continue
 
-        # Update lastHarsest time for registered provider
+        # Update lastHarvest time for registered provider
         with cxn:
             cxn.execute("UPDATE providers SET lastHarvest=? WHERE name=?",
                         (harvestTime, provider))
