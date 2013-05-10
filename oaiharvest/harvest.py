@@ -52,7 +52,6 @@ from argparse import ArgumentParser
 from datetime import datetime
 
 from oaipmh.client import Client
-from oaipmh.metadata import MetadataRegistry, oai_dc_reader
 from oaipmh.error import NoRecordsMatchError
 
 from metadata import DefaultingMetadataRegistry, XMLMetadataReader
@@ -86,7 +85,7 @@ class OAIHarvester(object):
 
 class DirectoryOAIHarvester(OAIHarvester):
     """OAI-PMH Harvester to output harvested records to files in a directory.
-    
+
     Directory to output files to is specified at object init/construction time.
     """
     
@@ -98,8 +97,15 @@ class DirectoryOAIHarvester(OAIHarvester):
         self.nRecs = nRecs
 
     def harvest(self, baseUrl, metadataPrefix, **kwargs):
-        """Harvest records, output records to files in the directory."""
+        """Harvest records, return if completed.
+
+        Harvest records, output records to files in the directory and
+        return a boolean for whether or not all of the records that the
+        server could return were actually stored locally.
+        """
         logger = logging.getLogger(__name__).getChild(self.__class__.__name__)
+        # A counter for the number of records actually returned
+        # enumerate() not used as it would include deleted records
         i = 0
         for header, metadata, about in self._listRecords(
                  baseUrl,
@@ -131,6 +137,12 @@ class DirectoryOAIHarvester(OAIHarvester):
                 else:
                     logger.debug("Ignoring server request to delete file {0}"
                                 "".format(fp))
+        else:
+            # Harvesting completed, all available records stored
+            return True
+        # Loop must have been stopped with ``break``, e.g. due to
+        # arbitrary limit
+        return False
 
 
 def main(argv=None):
@@ -210,12 +222,6 @@ def main(argv=None):
                                           respectDeletions=args.deletions,
                                           nRecs=args.limit
                                           )
-        # Generate harvest time now
-        # The first request might create a snapshot of the data on the
-        # provider server in order for resumption tokens to work correctly.
-        # Any records added after this snapshot, but before completion of
-        # harvesting should be included in next harvest.
-        harvestTime = datetime.now()
         # Create a dictionary of keyword args
         # Avoid sending kwargs with value of None - e.g. set=None causes
         # error on servers that don't support set hierarchy.
@@ -224,15 +230,28 @@ def main(argv=None):
             kwargs['from_'] = args.from_
         if args.until is not None:
             kwargs['until'] = args.until
+            # Set the end time of the harvest slice with which to
+            # update the registry if necessary
+            lastHarvestEndTime = args.until
+        else:
+            # Set the end time of the harvest slice to now
+            # The first request might create a snapshot of the data on
+            # the provider server in order for resumption tokens to work
+            # correctly. Any records added after this snapshot, but
+            # before completion of harvesting must be included in next
+            # harvest.
+            lastHarvestEndTime = datetime.now()
+             
         if args.set is not None:
             kwargs['set'] = args.set
         try:
-            harvester.harvest(baseUrl,
-                              args.metadataPrefix,
-                              **kwargs
-                              )
+            completed = harvester.harvest(baseUrl,
+                                          args.metadataPrefix,
+                                          **kwargs
+                                          )
         except NoRecordsMatchError:
             # Nothing to harvest
+            completed = True
             logger.info("0 records to harvest")
             logger.debug("The combination of the values of the from={0}, "
                          "until={1}, set=(N/A) and metadataPrefix={2} "
@@ -245,13 +264,18 @@ def main(argv=None):
             # Log error
             logger.error(str(e))
             # Continue to next provide without updating database lastHarvest
-            raise
             continue
 
-        # Update lastHarsest time for registered provider
-        with cxn:
-            cxn.execute("UPDATE providers SET lastHarvest=? WHERE name=?",
-                        (harvestTime, provider))
+        if completed:
+            # Update lastHarvest time for registered provider
+            with cxn:
+                cxn.execute("UPDATE providers SET lastHarvest=? WHERE name=?",
+                            (lastHarvestEndTime, provider)
+                            )
+        else:
+            logger.warn("Harvesting incomplete; additional records were "
+                        "available from the server")
+
 
 # Set up argument parser
 docbits = __doc__.split('\n\n')
