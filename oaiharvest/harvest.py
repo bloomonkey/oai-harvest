@@ -86,7 +86,7 @@ class OAIHarvester(object):
 
 class DirectoryOAIHarvester(OAIHarvester):
     """OAI-PMH Harvester to output harvested records to files in a directory.
-    
+
     Directory to output files to is specified at object init/construction time.
     """
     
@@ -98,8 +98,15 @@ class DirectoryOAIHarvester(OAIHarvester):
         self.nRecs = nRecs
 
     def harvest(self, baseUrl, metadataPrefix, **kwargs):
-        """Harvest records, output records to files in the directory."""
+        """Harvest records, return if completed.
+
+        Harvest records, output records to files in the directory and
+        return a boolean for whether or not all of the records that the
+        server could return were actually stored locally.
+        """
         logger = logging.getLogger(__name__).getChild(self.__class__.__name__)
+        # A counter for the number of records actually returned
+        # enumerate() not used as it would include deleted records
         i = 0
         for header, metadata, about in self._listRecords(
                  baseUrl,
@@ -131,6 +138,12 @@ class DirectoryOAIHarvester(OAIHarvester):
                 else:
                     logger.debug("Ignoring server request to delete file {0}"
                                 "".format(fp))
+        else:
+            # Harvesting completed, all available records stored
+            return True
+        # Loop must have been stopped with ``break``, e.g. due to
+        # arbitrary limit
+        return False
 
 
 def main(argv=None):
