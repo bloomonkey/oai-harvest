@@ -246,12 +246,13 @@ def main(argv=None):
         if args.set is not None:
             kwargs['set'] = args.set
         try:
-            harvester.harvest(baseUrl,
-                              args.metadataPrefix,
-                              **kwargs
-                              )
+            completed = harvester.harvest(baseUrl,
+                                          args.metadataPrefix,
+                                          **kwargs
+                                          )
         except NoRecordsMatchError:
             # Nothing to harvest
+            completed = True
             logger.info("0 records to harvest")
             logger.debug("The combination of the values of the from={0}, "
                          "until={1}, set=(N/A) and metadataPrefix={2} "
@@ -266,10 +267,16 @@ def main(argv=None):
             # Continue to next provide without updating database lastHarvest
             continue
 
-        # Update lastHarvest time for registered provider
-        with cxn:
-            cxn.execute("UPDATE providers SET lastHarvest=? WHERE name=?",
-                        (lastHarvestEndTime, provider))
+        if completed:
+            # Update lastHarvest time for registered provider
+            with cxn:
+                cxn.execute("UPDATE providers SET lastHarvest=? WHERE name=?",
+                            (lastHarvestEndTime, provider)
+                            )
+        else:
+            logger.warn("Harvesting incomplete; additional records were "
+                        "available from the server")
+
 
 # Set up argument parser
 docbits = __doc__.split('\n\n')
