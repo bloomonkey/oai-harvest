@@ -210,12 +210,6 @@ def main(argv=None):
                                           respectDeletions=args.deletions,
                                           nRecs=args.limit
                                           )
-        # Generate harvest time now
-        # The first request might create a snapshot of the data on the
-        # provider server in order for resumption tokens to work correctly.
-        # Any records added after this snapshot, but before completion of
-        # harvesting should be included in next harvest.
-        harvestTime = datetime.now()
         # Create a dictionary of keyword args
         # Avoid sending kwargs with value of None - e.g. set=None causes
         # error on servers that don't support set hierarchy.
@@ -224,6 +218,18 @@ def main(argv=None):
             kwargs['from_'] = args.from_
         if args.until is not None:
             kwargs['until'] = args.until
+            # Set the end time of the harvest slice with which to
+            # update the registry if necessary
+            lastHarvestEndTime = args.until
+        else:
+            # Set the end time of the harvest slice to now
+            # The first request might create a snapshot of the data on
+            # the provider server in order for resumption tokens to work
+            # correctly. Any records added after this snapshot, but
+            # before completion of harvesting must be included in next
+            # harvest.
+            lastHarvestEndTime = datetime.now()
+             
         if args.set is not None:
             kwargs['set'] = args.set
         try:
@@ -250,7 +256,7 @@ def main(argv=None):
         # Update lastHarvest time for registered provider
         with cxn:
             cxn.execute("UPDATE providers SET lastHarvest=? WHERE name=?",
-                        (harvestTime, provider))
+                        (lastHarvestEndTime, provider))
 
 # Set up argument parser
 docbits = __doc__.split('\n\n')
