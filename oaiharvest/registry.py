@@ -191,7 +191,7 @@ def list_providers(cxn, args):
         label = "metadataPrefix"
     elif args.lastHarvest:
         sql = 'SELECT name, lastHarvest FROM providers'
-        label = "Last Harvest Time"
+        label = "Last Completed Harvest Time"
     else:
         # Default is smart URL for next harvest request
         sql = ("SELECT name, url || "
@@ -326,7 +326,9 @@ group.add_argument('-p', '--metadataPrefix',
 group.add_argument('-l', '--lastHarvest',
                    action='store_true', dest='lastHarvest',
                    default=False,
-                   help="list providers with their last harvest date and time"
+                   help=("list providers with the time and date of their "
+                         "last completed harvest"
+                         )
                    )
 parser_list.set_defaults(func=list_providers)
 
