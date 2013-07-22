@@ -119,6 +119,8 @@ class DirectoryOAIHarvester(OAIHarvester):
                                "{0}.{1}.xml".format(header.identifier(),
                                                     metadataPrefix)
                                )
+            if not os.path.exists(os.path.dirname(fp)):
+                os.makedirs(os.path.dirname(fp))
             if not header.isDeleted():
                 logger.debug('Writing to file {0}'.format(fp))
                 with open(fp, 'w') as fh:
@@ -134,6 +136,7 @@ class DirectoryOAIHarvester(OAIHarvester):
                         # File probably does't exist in destination directory
                         # No further action needed
                         pass
+
                 else:
                     logger.debug("Ignoring server request to delete file {0}"
                                 "".format(fp))
