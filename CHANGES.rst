@@ -1,6 +1,30 @@
 CHANGES
 =======
 
+1.1.2 Wednesday 24th July 2013
+------------------------------
+
+ENHANCEMENTS
+~~~~~~~~~~~~
+
+- Automatically create download directory if missing
+  Thanks to `@mhoffman <https://github.com/mhoffman>`_.
+
+
+1.1.1 Friday 10th May 2013
+--------------------------
+
+BUG FIXES
+~~~~~~~~~
+
+- Removed rogue debugging `raise` statement
+
+- Update registry with `--until` option when given
+
+- Only update registry if harvest completed
+  (i.e. not truncated with `--limit=N`)
+
+
 1.1 Thursday 9th May 2013
 -------------------------
 

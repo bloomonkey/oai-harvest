@@ -9,12 +9,14 @@ import distribute_setup
 distribute_setup.use_setuptools()
 from setuptools import setup, find_packages
 
+import oaiharvest
+
 # Check Python version
 py_version = getattr(sys, 'version_info', (0, 0, 0))
 
 # Basic information
 _name = "oaiharvest"
-_version = "1.2"
+_version = oaiharvest.__version__
 _description = ("A harvester to collect records from an OAI-PMH enabled "
                 "provider.")
 _author = 'John Harrison'
