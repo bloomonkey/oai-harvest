@@ -119,11 +119,11 @@ class DirectoryOAIHarvester(OAIHarvester):
                                "{0}.{1}.xml".format(header.identifier(),
                                                     metadataPrefix)
                                )
-            if not os.path.exists(self._dir):
+            if not os.path.isdir(os.path.dirname(fp)):
                 logger.debug("Creating target directory {0}"
                              "".format(self._dir)
                              )
-                os.makedirs(self._dir)
+                os.makedirs(os.path.dirname(fp))
             if not header.isDeleted():
                 logger.debug('Writing to file {0}'.format(fp))
                 with open(fp, 'w') as fh:
