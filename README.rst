@@ -1,7 +1,7 @@
 OAI-PMH Harvest
 ===============
 
-24th July 2013 (2013-07-24)
+14th October 2013 (2013-10-14)
 
 Contents
 --------
