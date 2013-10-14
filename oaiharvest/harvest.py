@@ -47,6 +47,7 @@ from __future__ import with_statement
 import logging
 import os
 import sys
+import urllib
 
 from argparse import ArgumentParser
 from datetime import datetime
@@ -90,10 +91,11 @@ class DirectoryOAIHarvester(OAIHarvester):
     """
     
     def __init__(self, mdRegistry, directory,
-                 respectDeletions=True, nRecs=0):
+                 respectDeletions=True, createSubDirs=False, nRecs=0):
         OAIHarvester.__init__(self, mdRegistry)
         self._dir = os.path.abspath(directory)
         self.respectDeletions = respectDeletions
+        self.createSubDirs = createSubDirs
         self.nRecs = nRecs
 
     def harvest(self, baseUrl, metadataPrefix, **kwargs):
@@ -115,15 +117,27 @@ class DirectoryOAIHarvester(OAIHarvester):
                 logger.info("Stopping harvest; set limit of {0} has been "
                             "reached".format(self.nRecs))
                 break
+            filename = "{0}.{1}.xml".format(header.identifier(),
+                                            metadataPrefix
+                                            )
+            if not self.createSubDirs:
+                # Escape file path, but protect ``:``s
+                filename = urllib.quote(filename, ':')
+            else:
+                # Do not escape path separators, so that sub-directories
+                # can be created
+                filename = urllib.quote(filename, ':' + os.path.sep)
+
             fp =  os.path.join(self._dir,
-                               "{0}.{1}.xml".format(header.identifier(),
-                                                    metadataPrefix)
+                               filename
                                )
-            if not os.path.exists(self._dir):
+            if not os.path.isdir(os.path.dirname(fp)):
+                # Missing base directory or sub-directory
                 logger.debug("Creating target directory {0}"
                              "".format(self._dir)
                              )
-                os.makedirs(self._dir)
+                os.makedirs(os.path.dirname(fp))
+
             if not header.isDeleted():
                 logger.debug('Writing to file {0}'.format(fp))
                 with open(fp, 'w') as fh:
@@ -225,6 +239,7 @@ def main(argv=None):
         harvester = DirectoryOAIHarvester(metadata_registry,
                                           os.path.abspath(args.dir),
                                           respectDeletions=args.deletions,
+                                          createSubDirs=args.subdirs,
                                           nRecs=args.limit
                                           )
         # Create a dictionary of keyword args
@@ -350,6 +365,15 @@ argparser.add_argument("-l", "--limit",
                        help=("place a limit on the number of records to "
                              "harvest from each provider")
                        )
+# What to do about / character in identifiers
+argparser.add_argument("--create-subdirs",
+                       action='store_true',
+                       dest='subdirs',
+                       help=("create target subdirs (based on slashes in "
+                             "identifiers) if they don't exist"
+                             )
+                       )
+
 
 # Set up metadata registry
 xmlReader = XMLMetadataReader()
