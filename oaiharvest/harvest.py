@@ -46,6 +46,7 @@ from __future__ import with_statement
 
 import logging
 import os
+import platform
 import sys
 import urllib
 
@@ -123,10 +124,10 @@ class DirectoryOAIHarvester(OAIHarvester):
             filename = "{0}.{1}.xml".format(header.identifier(),
                                             metadataPrefix
                                             )
-            if not self.createSubDirs:
-                # Escape file path, but protect ``:``s
-                filename = urllib.quote(filename, ':')
-            else:
+            protected = []
+            if platform.system() != 'Windows':
+                protected.append(':')
+            if self.createSubDirs:
                 if isinstance(self.createSubDirs, basestring):
                     # Replace specified character with platform path separator
                     filename = filename.replace(self.createSubDirs,
@@ -134,8 +135,9 @@ class DirectoryOAIHarvester(OAIHarvester):
                                                 )
                 # Do not escape path separators, so that sub-directories
                 # can be created
-                filename = urllib.quote(filename, ':' + os.path.sep)
+                protected.append(os.path.sep)
 
+            filename = urllib.quote(filename, ''.join(protected))
             fp =  os.path.join(self._dir,
                                filename
                                )
