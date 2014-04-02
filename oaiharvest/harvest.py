@@ -61,14 +61,14 @@ from registry import verify_database
 
 class OAIHarvester(object):
     """Abstract Base Class for an OAI-PMH Harvester.
-    
+
     Should be sub-classed in order to do useful things with the harvested
     records (e.g. put them in a directory, VCS repository, local database etc.
     """
 
     def __init__(self, mdRegistry):
         self._mdRegistry = mdRegistry
-    
+
     def _listRecords(self, baseUrl, metadataPrefix="oai_dc", **kwargs):
         # Generator to yield records from baseUrl in the given metadataPrefix
         # Add metatdataPrefix to args
@@ -81,15 +81,18 @@ class OAIHarvester(object):
 
     def harvest(self, baseUrl, metadataPrefix, **kwargs):
         "Harvest records"
-        raise NotImplementedError("{0.__class__.__name__} must be sub-classed")
+        raise NotImplementedError(
+            "{0.__class__.__name__} must be sub-classed".format(self)
+        )
 
 
 class DirectoryOAIHarvester(OAIHarvester):
     """OAI-PMH Harvester to output harvested records to files in a directory.
 
-    Directory to output files to is specified at object init/construction time.
+    Directory to output files to is specified at object init/construction
+    time.
     """
-    
+
     def __init__(self, mdRegistry, directory,
                  respectDeletions=True, createSubDirs=False, nRecs=0):
         OAIHarvester.__init__(self, mdRegistry)
@@ -124,6 +127,11 @@ class DirectoryOAIHarvester(OAIHarvester):
                 # Escape file path, but protect ``:``s
                 filename = urllib.quote(filename, ':')
             else:
+                if isinstance(self.createSubDirs, basestring):
+                    # Replace specified character with platform path separator
+                    filename = filename.replace(self.createSubDirs,
+                                                os.path.sep
+                                                )
                 # Do not escape path separators, so that sub-directories
                 # can be created
                 filename = urllib.quote(filename, ':' + os.path.sep)
@@ -145,8 +153,8 @@ class DirectoryOAIHarvester(OAIHarvester):
                 i += 1
             else:
                 if self.respectDeletions:
-                    logger.debug("Respecting server request to delete file {0}"
-                                "".format(fp))
+                    logger.debug("Respecting server request to delete file "
+                                 "{0}".format(fp))
                     try:
                         os.remove(fp)
                     except OSError:
@@ -154,8 +162,8 @@ class DirectoryOAIHarvester(OAIHarvester):
                         # No further action needed
                         pass
                 else:
-                    logger.debug("Ignoring server request to delete file {0}"
-                                "".format(fp))
+                    logger.debug("Ignoring server request to delete file "
+                                 "{0}".format(fp))
         else:
             # Harvesting completed, all available records stored
             return True
@@ -261,7 +269,7 @@ def main(argv=None):
             # before completion of harvesting must be included in next
             # harvest.
             lastHarvestEndTime = datetime.now()
-             
+
         if args.set is not None:
             kwargs['set'] = args.set
         try:
@@ -365,14 +373,24 @@ argparser.add_argument("-l", "--limit",
                        help=("place a limit on the number of records to "
                              "harvest from each provider")
                        )
-# What to do about / character in identifiers
-argparser.add_argument("--create-subdirs",
-                       action='store_true',
-                       dest='subdirs',
-                       help=("create target subdirs (based on slashes in "
-                             "identifiers) if they don't exist"
-                             )
-                       )
+# What to do about sub-directories
+group = argparser.add_mutually_exclusive_group()
+group.set_defaults(subdirs=None)
+group.add_argument("--create-subdirs",
+                   action='store_true',
+                   dest='subdirs',
+                   help=("create target subdirs (based on / characters in "
+                         "identifiers) if they don't exist. To use something "
+                         "other than /, use the newer --subdirs-on option"
+                         )
+                   )
+group.add_argument("--subdirs-on",
+                   action='store',
+                   dest='subdirs',
+                   help=("create target subdirs based on occurrences of the "
+                         "given character in identifiers"
+                         )
+                   )
 
 
 # Set up metadata registry
