@@ -1,6 +1,32 @@
 CHANGES
 =======
 
+1.1.4 Wednesday 2nd April 2014
+------------------------------
+
+ENHANCEMENTS
+~~~~~~~~~~~~
+
+- Add an option to specify a string that, when it occurs in identifiers, is
+  treated as a separator to store harvested records in sub-directories.
+
+
+BUG FIXES
+~~~~~~~~~
+
+- Fix bug in file name escaping on Windows. On Windows do not protect :
+  characters from being escaped.
+
+
+1.1.3 Monday 14th October 2013
+------------------------------
+
+ENHANCEMENTS
+~~~~~~~~~~~~
+
+- Add option for creating sub-directories based on slashes in identifiers.
+
+
 1.1.2 Wednesday 24th July 2013
 ------------------------------
 
