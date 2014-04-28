@@ -1,6 +1,16 @@
 CHANGES
 =======
 
+1.1.5 Monday 28th April 2014
+----------------------------
+
+ENHANCEMENTS
+~~~~~~~~~~~~
+
+- Report an appropriate error when a given URL does not appear to resolve to
+  an OAI-PMH server.
+
+
 1.1.4 Wednesday 2nd April 2014
 ------------------------------
 
