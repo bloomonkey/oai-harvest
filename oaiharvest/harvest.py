@@ -42,7 +42,7 @@ All rights reserved.
 Distributed under the terms of the BSD 3-clause License
 <http://opensource.org/licenses/BSD-3-Clause>.
 """
-from __future__ import with_statement
+from __future__ import with_statement, absolute_import
 
 import logging
 import os
@@ -56,8 +56,8 @@ from datetime import datetime
 from oaipmh.client import Client
 from oaipmh.error import NoRecordsMatchError
 
-from metadata import DefaultingMetadataRegistry, XMLMetadataReader
-from registry import verify_database
+from .metadata import DefaultingMetadataRegistry, XMLMetadataReader
+from .registry import verify_database
 
 
 class OAIHarvester(object):
