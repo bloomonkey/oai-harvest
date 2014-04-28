@@ -56,6 +56,7 @@ from datetime import datetime
 from oaipmh.client import Client
 from oaipmh.error import NoRecordsMatchError
 
+from .exceptions import NotOAIPMHBaseURLException
 from .metadata import DefaultingMetadataRegistry, XMLMetadataReader
 from .registry import verify_database
 
@@ -75,6 +76,14 @@ class OAIHarvester(object):
         # Add metatdataPrefix to args
         kwargs['metadataPrefix'] = metadataPrefix
         client = Client(baseUrl, metadata_registry)
+        # Check that baseUrl actually represents an OAI-PMH target
+        try:
+            client.identify()
+        except IndexError:
+            raise NotOAIPMHBaseURLException(
+                "{0} does not appear to be an OAI-PMH compatible base URL"
+                "".format(baseUrl)
+            )
         # Check server timestamp granularity support
         client.updateGranularity()
         for record in client.listRecords(**kwargs):
