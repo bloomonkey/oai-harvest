@@ -1,7 +1,7 @@
 OAI-PMH Harvest
 ===============
 
-2nd April 2014 (2014-04-02)
+28th April 2014 (2014-04-28)
 
 Contents
 --------
@@ -133,7 +133,7 @@ or submit a pull request on GitHub.
 Copyright And Licensing
 -----------------------
 
-Copyright (c) `University of Liverpool`_, 2013
+Copyright (c) `University of Liverpool`_, 2013-2014
 
 See `LICENSE.rst <LICENSE.rst>`_ for licensing details.
 
