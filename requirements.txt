@@ -1,2 +1,3 @@
 lxml>=2.1
 pyoai>=2.4
+setuptools>=14.3
