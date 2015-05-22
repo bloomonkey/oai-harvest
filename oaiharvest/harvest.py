@@ -75,7 +75,7 @@ class OAIHarvester(object):
         # Generator to yield records from baseUrl in the given metadataPrefix
         # Add metatdataPrefix to args
         kwargs['metadataPrefix'] = metadataPrefix
-        client = Client(baseUrl, metadata_registry)
+        client = Client(baseUrl, self._mdRegistry)
         # Check that baseUrl actually represents an OAI-PMH target
         try:
             client.identify()
