@@ -77,7 +77,7 @@ def add_provider(cxn, args):
     # Get any missing information
     # Base URL
     if args.url is None:
-        args.url = raw_input('Base URL:'.ljust(20))
+        args.url = raw_input('Base URL: '.ljust(20))
         if not args.url:
             addlogger.critical('Base URL for new provider not supplied')
             return 1
