@@ -243,10 +243,7 @@ def verify_database(path):
 def main(argv=None):
     '''Process command line options, hand off to appropriate function.'''
     global argparser, connection, logger
-    if argv is None:
-        args = argparser.parse_args()
-    else:
-        args = argparser.parse_args(argv)
+    args = argparser.parse_args() if argv is None else argparser.parse_args(argv)
     cxn = verify_database(args.databasePath)
     if not isinstance(cxn, sqlite3.Connection):
         return cxn
