@@ -5,9 +5,9 @@ from __future__ import with_statement
 import sys
 
 # Import Distribute / Setuptools
-import distribute_setup
-distribute_setup.use_setuptools()
-from setuptools import setup, find_packages
+import ez_setup
+ez_setup.use_setuptools()
+from setuptools import setup
 
 import oaiharvest
 
