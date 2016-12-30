@@ -77,7 +77,7 @@ def add_provider(cxn, args):
     # Get any missing information
     # Base URL
     if args.url is None:
-        args.url = raw_input('Base URL:'.ljust(20))
+        args.url = raw_input('Base URL: '.ljust(20))
         if not args.url:
             addlogger.critical('Base URL for new provider not supplied')
             return 1
@@ -243,10 +243,7 @@ def verify_database(path):
 def main(argv=None):
     '''Process command line options, hand off to appropriate function.'''
     global argparser, connection, logger
-    if argv is None:
-        args = argparser.parse_args()
-    else:
-        args = argparser.parse_args(argv)
+    args = argparser.parse_args() if argv is None else argparser.parse_args(argv)
     cxn = verify_database(args.databasePath)
     if not isinstance(cxn, sqlite3.Connection):
         return cxn
