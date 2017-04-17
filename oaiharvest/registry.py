@@ -27,6 +27,9 @@ import os
 import sqlite3
 import sys
 
+# Python3 compatibility
+from six.moves import input
+
 from argparse import ArgumentParser
 from datetime import datetime
 
@@ -34,7 +37,7 @@ from datetime import datetime
 from oaipmh.client import Client
 from oaipmh.metadata import MetadataRegistry, oai_dc_reader
 from oaipmh.error import XMLSyntaxError
-from urllib2 import HTTPError
+from six.moves.urllib.error import HTTPError
 
 
 MAX_NAME_LENGTH = 15
@@ -77,7 +80,7 @@ def add_provider(cxn, args):
     # Get any missing information
     # Base URL
     if args.url is None:
-        args.url = raw_input('Base URL: '.ljust(20))
+        args.url = input('Base URL: '.ljust(20))
         if not args.url:
             addlogger.critical('Base URL for new provider not supplied')
             return 1
@@ -94,7 +97,7 @@ def add_provider(cxn, args):
         return 1
     # Destination
     if args.dest is None:
-        args.dest = raw_input('Destination directory: '.ljust(20))
+        args.dest = input('Destination directory: '.ljust(20))
         if args.dest:
             # Expand user dir
             args.dest = os.path.expanduser(args.dest)
@@ -110,11 +113,11 @@ def add_provider(cxn, args):
                     for mdpinfo in
                     client.listMetadataFormats())
     while args.metadataPrefix not in mdps:
-        print "Available metadataPrefix values:"
+        print("Available metadataPrefix values:")
         # List available formats
         for mdp in mdps:
-            print mdp, '-', mdps[mdp][1]
-        args.metadataPrefix = raw_input('metadataPrefix [oai_dc]:'.ljust(20))
+            print(mdp, '-', mdps[mdp][1])
+        args.metadataPrefix = input('metadataPrefix [oai_dc]:'.ljust(20))
         if not args.metadataPrefix:
             addlogger.info('metadataPrefix for new provider not supplied. '
                            'using default: oai_dc')
