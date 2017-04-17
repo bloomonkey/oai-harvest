@@ -210,7 +210,7 @@ def main(argv=None):
                           in cxn.execute('SELECT name FROM providers')
                           ])
     for provider in providers:
-        if not provider.startswith('http://'):
+        if not provider.startswith('http://') and not provider.startswith('https://'):
             # Fetch details from provider registry
             cursor = cxn.execute('SELECT url, '
                                  'destination, '
