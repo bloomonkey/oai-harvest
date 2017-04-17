@@ -48,7 +48,7 @@ import logging
 import os
 import platform
 import sys
-import urllib
+import six.moves.urllib.parse as urllib
 
 from argparse import ArgumentParser
 from datetime import datetime
