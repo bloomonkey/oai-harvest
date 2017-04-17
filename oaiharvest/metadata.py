@@ -4,7 +4,7 @@ import logging
 
 from oaipmh.metadata import MetadataRegistry
 from lxml.etree import tostring
-
+import six
 
 class DefaultingMetadataRegistry(MetadataRegistry):
     """MetadataRegistry with default reader and/or writer.
@@ -45,9 +45,10 @@ class DefaultingMetadataRegistry(MetadataRegistry):
 class XMLMetadataReader(object):
     """Really simple MetadataReader to serialize metadata to pretty XML."""
     def __call__(self, metadata_element):
-        return '\n'.join([tostring(rec_element,
-                                   method="xml",
-                                   pretty_print=True
-                                   )
-                          for rec_element
-                          in metadata_element])
+        # Six call fixes 'sequence item 0: expected str instance, bytes found'
+        return ('\n' if six.PY2 else b'\n').join(
+          [tostring(rec_element,
+                    method="xml",
+                    pretty_print=True)
+           for rec_element
+           in metadata_element])
