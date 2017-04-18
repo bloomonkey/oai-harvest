@@ -160,7 +160,7 @@ class DirectoryOAIHarvester(OAIHarvester):
 
             if not header.isDeleted():
                 logger.debug('Writing to file {0}'.format(fp))
-                with open(fp, 'w' if six.PY2 else 'wb') as fh:
+                with open(fp, 'w') as fh:
                     fh.write(metadata)
                 i += 1
             else:

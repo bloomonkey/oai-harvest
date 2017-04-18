@@ -46,9 +46,10 @@ class XMLMetadataReader(object):
     """Really simple MetadataReader to serialize metadata to pretty XML."""
     def __call__(self, metadata_element):
         # Six call fixes 'sequence item 0: expected str instance, bytes found'
-        return ('\n' if six.PY2 else b'\n').join(
-          [tostring(rec_element,
+        return '\n'.join(
+          [six.text_type(
+              tostring(rec_element,
                     method="xml",
-                    pretty_print=True)
+                    pretty_print=True))
            for rec_element
            in metadata_element])
