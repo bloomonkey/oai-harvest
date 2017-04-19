@@ -1,6 +1,16 @@
 CHANGES
 =======
 
+1.2.0 Friday 30th December 2016
+-------------------------------
+
+BUG FIXES
+~~~~~~~~~
+
+- Fix build by using ``ez_setup.py`` instead of ``distribute_setup.py`` for
+  bootstrapping setuptools.
+
+
 1.1.5 Monday 28th April 2014
 ----------------------------
 
