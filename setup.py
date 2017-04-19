@@ -1,15 +1,10 @@
 """Setup for OAI Harvester."""
-
 from __future__ import with_statement
 
-import sys
 from setuptools import setup
-
-import oaiharvest
 
 # Basic information
 _name = "oaiharvest"
-_version = oaiharvest.__version__
 _description = ("A harvester to collect records from an OAI-PMH enabled "
                 "provider.")
 _author = 'John Harrison'
