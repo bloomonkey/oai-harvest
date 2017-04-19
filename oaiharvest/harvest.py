@@ -49,6 +49,7 @@ import os
 import platform
 import sys
 import six
+import ast
 
 from argparse import ArgumentParser
 from datetime import datetime
@@ -90,7 +91,11 @@ class OAIHarvester(object):
         # Check server timestamp granularity support
         client.updateGranularity()
         for record in client.listRecords(**kwargs):
-            yield record
+            header, metadata, about = record
+            # Fix pyoai returning a "b'...'" string for py3k
+            if metadata.startswith("b'"):
+                metadata = ast.literal_eval(metadata).decode("utf-8")
+            yield (header, metadata, about)
 
     def harvest(self, baseUrl, metadataPrefix, **kwargs):
         "Harvest records"
