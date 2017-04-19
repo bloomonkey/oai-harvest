@@ -1,7 +1,17 @@
 OAI-PMH Harvest
 ===============
 
-28th April 2014 (2014-04-28)
+.. image:: https://travis-ci.org/bloomonkey/oai-harvest.svg?branch=master
+   :target: https://travis-ci.org/bloomonkey/oai-harvest
+
+.. image:: https://img.shields.io/pypi/v/oaiharvest.svg
+   :target: https://pypi.python.org/pypi/oaiharvest
+   :alt: Latest Version
+
+.. image:: https://img.shields.io/pypi/l/oaiharvest.svg
+   :target: LICENSE.rst
+   :alt: license:BSD
+
 
 Contents
 --------
@@ -54,9 +64,9 @@ The latest release version is available in the Python Packages Index:
 
 https://pypi.python.org/pypi/oaiharvest
 
-.. image:: https://pypip.in/v/oaiharvest/badge.png
-    :target: https://crate.io/packages/oaiharvest/
-    :alt: Latest PyPI version
+.. image:: https://img.shields.io/pypi/v/oaiharvest.svg
+   :target: https://pypi.python.org/pypi/oaiharvest
+   :alt: Latest PyPI Version
 
 .. image:: https://pypip.in/d/oaiharvest/badge.png
     :target: https://crate.io/packages/oaiharvest/
@@ -145,6 +155,11 @@ or submit a pull request on GitHub.
 
 Copyright And Licensing
 -----------------------
+
+
+.. image:: https://img.shields.io/pypi/l/oaiharvest.svg
+   :target: LICENSE.rst
+   :alt: license:BSD
 
 Copyright (c) `University of Liverpool`_, 2013-2014
 
