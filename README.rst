@@ -116,13 +116,20 @@ there.
 
        git clone git@github.com:<username>/oai-harvest.git
 
-3. Install dependencies::
+3. Setup development virtualenv using tox::
 
-       pip install -r requirements.txt
+       pip install tox
+       tox -e dev
 
-4. Install in develop / editable mode::
+4. Activate development virtualenv:
 
-       pip install -e .
+   -nix::
+
+       source env/bin/activate
+
+   Windows::
+
+       env\Scripts\activate
 
 
 Bugs, Feature requests etc.
