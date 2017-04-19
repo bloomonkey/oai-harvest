@@ -1,4 +1,5 @@
 lxml>=2.1
+mock>=2.0.0
 pyoai>=2.4
 six >= 1.0
 setuptools>=35.0.1
