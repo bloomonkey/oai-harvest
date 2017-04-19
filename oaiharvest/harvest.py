@@ -48,11 +48,12 @@ import logging
 import os
 import platform
 import sys
-import six
-import six.moves.urllib.parse as urllib
 
 from argparse import ArgumentParser
 from datetime import datetime
+
+import six.moves.urllib.parse as urllib
+from six import string_types
 
 from oaipmh.client import Client
 from oaipmh.error import NoRecordsMatchError
@@ -138,7 +139,7 @@ class DirectoryOAIHarvester(OAIHarvester):
             if platform.system() != 'Windows':
                 protected.append(':')
             if self.createSubDirs:
-                if isinstance(self.createSubDirs, basestring):
+                if isinstance(self.createSubDirs, string_types):
                     # Replace specified character with platform path separator
                     filename = filename.replace(self.createSubDirs,
                                                 os.path.sep
