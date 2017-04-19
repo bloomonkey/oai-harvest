@@ -48,7 +48,6 @@ import logging
 import os
 import platform
 import sys
-import traceback
 import six
 
 from argparse import ArgumentParser
@@ -308,9 +307,7 @@ def main(argv=None):
                          )
         except Exception as e:
             # Log error
-            logger.error(str(e))
-            # Print traceback
-            traceback.print_exc(*sys.exc_info())
+            logger.error(str(e), exc_info=True)
             # Continue to next provide without updating database lastHarvest
             continue
 
