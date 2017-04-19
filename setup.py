@@ -27,7 +27,7 @@ with open('requirements.txt', 'r') as fh:
 # Setup
 setup(
     name=_name,
-    version=_version,
+    use_scm_version=True,
     description=_description,
     long_description=_long_description,
     packages=[_name],
@@ -40,7 +40,7 @@ setup(
                                'requirements.txt', '.gitignore']},
     requires=['lxml(>=2.1)', 'pyoai(>=2.4)'],
     install_requires=_install_requires,
-    setup_requires=['setuptools-git'],
+    setup_requires=['setuptools-git', 'setuptools_scm', 'wheel'],
     extras_require={
         ':python_version=="2.6"': ['argparse'],
         ':python_version=="2.7"': ['argparse'],
