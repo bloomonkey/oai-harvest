@@ -1,7 +1,17 @@
 OAI-PMH Harvest
 ===============
 
-28th April 2014 (2014-04-28)
+.. image:: https://travis-ci.org/bloomonkey/oai-harvest.svg?branch=master
+   :target: https://travis-ci.org/bloomonkey/oai-harvest
+
+.. image:: https://img.shields.io/pypi/v/oaiharvest.svg
+   :target: https://pypi.python.org/pypi/oaiharvest
+   :alt: Latest Version
+
+.. image:: https://img.shields.io/pypi/l/oaiharvest.svg
+   :target: LICENSE.rst
+   :alt: license:BSD
+
 
 Contents
 --------
@@ -54,14 +64,9 @@ The latest release version is available in the Python Packages Index:
 
 https://pypi.python.org/pypi/oaiharvest
 
-.. image:: https://pypip.in/v/oaiharvest/badge.png
-    :target: https://crate.io/packages/oaiharvest/
-    :alt: Latest PyPI version
-
-.. image:: https://pypip.in/d/oaiharvest/badge.png
-    :target: https://crate.io/packages/oaiharvest/
-    :alt: Number of PyPI downloads
-
+.. image:: https://img.shields.io/pypi/v/oaiharvest.svg
+   :target: https://pypi.python.org/pypi/oaiharvest
+   :alt: Latest PyPI Version
 
 
 Source code is under version control and available from:
@@ -82,11 +87,17 @@ in this README file!
 Requirements / Dependencies
 ---------------------------
 
-- Python_ >= 2.6
+- Python_ >= 2.6 or Python 3.x
 - pyoai_
 - lxml_
 - sqlite3_
 
+Note that Python 3.x support requires pyoai 2.4.6+.
+
+As this release is not yet available on PyPI, use
+``pip3 install git+https://github.com/infrae/pyoai.git``
+
+Python3 support is still in beta and might have some bugs.
 
 Installation
 ------------
@@ -110,13 +121,20 @@ there.
 
        git clone git@github.com:<username>/oai-harvest.git
 
-3. Install dependencies::
+3. Setup development virtualenv using tox::
 
-       pip install -r requirements.txt
+       pip install tox
+       tox -e dev
 
-4. Install in develop / editable mode::
+4. Activate development virtualenv:
 
-       pip install -e .
+   -nix::
+
+       source env/bin/activate
+
+   Windows::
+
+       env\Scripts\activate
 
 
 Bugs, Feature requests etc.
@@ -132,6 +150,11 @@ or submit a pull request on GitHub.
 
 Copyright And Licensing
 -----------------------
+
+
+.. image:: https://img.shields.io/pypi/l/oaiharvest.svg
+   :target: LICENSE.rst
+   :alt: license:BSD
 
 Copyright (c) `University of Liverpool`_, 2013-2014
 

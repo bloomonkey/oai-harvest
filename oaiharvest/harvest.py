@@ -36,7 +36,7 @@ optional arguments:
                         place a limit on the number of records to harvest from
                         each provider
 
-Copyright © 2013, the University of Liverpool <http://www.liv.ac.uk>.
+Copyright (c) 2013, the University of Liverpool <http://www.liv.ac.uk>.
 All rights reserved.
 
 Distributed under the terms of the BSD 3-clause License
@@ -48,7 +48,8 @@ import logging
 import os
 import platform
 import sys
-import urllib
+import six
+import six.moves.urllib.parse as urllib
 
 from argparse import ArgumentParser
 from datetime import datetime
@@ -210,7 +211,7 @@ def main(argv=None):
                           in cxn.execute('SELECT name FROM providers')
                           ])
     for provider in providers:
-        if not provider.startswith('http://'):
+        if not provider.startswith(('http://', 'https://')):
             # Fetch details from provider registry
             cursor = cxn.execute('SELECT url, '
                                  'destination, '
