@@ -48,6 +48,7 @@ import logging
 import os
 import platform
 import sys
+import six
 
 from argparse import ArgumentParser
 from datetime import datetime
@@ -306,7 +307,7 @@ def main(argv=None):
                          )
         except Exception as e:
             # Log error
-            logger.error(str(e))
+            logger.error(str(e), exc_info=True)
             # Continue to next provide without updating database lastHarvest
             continue
 
