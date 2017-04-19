@@ -16,7 +16,7 @@ _version = oaiharvest.__version__
 _description = ("A harvester to collect records from an OAI-PMH enabled "
                 "provider.")
 _author = 'John Harrison'
-_author_email = 'john.harrison@liv.ac.uk'
+_author_email = 'john@bloomonkey.co.uk'
 
 # Find longer description from README
 with open('README.rst', 'r') as fh:
@@ -60,7 +60,7 @@ setup(
         "Intended Audience :: Information Technology",
         "License :: OSI Approved :: BSD License",
         "Programming Language :: Python :: 2.6",
-        "Programming Language :: Python :: 2.7", 
+        "Programming Language :: Python :: 2.7",
         "Topic :: Text Processing :: Markup",
     ]
 )
