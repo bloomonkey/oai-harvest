@@ -68,11 +68,6 @@ https://pypi.python.org/pypi/oaiharvest
    :target: https://pypi.python.org/pypi/oaiharvest
    :alt: Latest PyPI Version
 
-.. image:: https://pypip.in/d/oaiharvest/badge.png
-    :target: https://crate.io/packages/oaiharvest/
-    :alt: Number of PyPI downloads
-
-
 
 Source code is under version control and available from:
 
