@@ -6,11 +6,13 @@ Created 19. Apr 2017 17:42
 Creator: john.harrison
 
 """
-
+import os
 import unittest
 from tempfile import TemporaryDirectory
+from uuid import uuid4
 
 from mock import Mock, patch
+from oaipmh.common import Header, Metadata
 from oaipmh.metadata import MetadataRegistry
 
 from oaiharvest.exceptions import NotOAIPMHBaseURLException
@@ -59,8 +61,7 @@ class DirectoryOAIHarvesterrTestCase(unittest.TestCase):
         url = 'https://www.example.com'
 
         with self.assertRaises(NotOAIPMHBaseURLException):
-            for rec in self.harvester._listRecords(url):
-                pass
+            list(self.harvester._listRecords(url))
 
     @patch('oaiharvest.harvest.Client')
     def test_listRecords(self, MockClient):
@@ -80,6 +81,35 @@ class DirectoryOAIHarvesterrTestCase(unittest.TestCase):
         client.listRecords.assert_called_once_with(
             metadataPrefix='oai_dc',
             foo='bar'
+        )
+
+    @patch('oaiharvest.harvest.Client')
+    def test_harvest(self, MockClient):
+        mock_recs = [
+            self._make_pyoai_record(),
+            self._make_pyoai_record(),
+            self._make_pyoai_record(),
+        ]
+        client = MockClient.return_value
+        client.listRecords.return_value = iter(mock_recs)
+        url = 'https://oai.example.com'
+
+        self.assertTrue(self.harvester.harvest(url, 'oai_dc'))
+        self.assertEqual(
+            len(os.listdir(self.direcory.name)),
+            len(mock_recs)
+        )
+
+    # Helpers
+
+    def _make_pyoai_record(self):
+        header = Mock(spec_set=Header)
+        header.identifier.return_value = uuid4()
+        header.isDeleted.return_value = False
+        return (
+            header,
+            "<xml>data</xml>",
+            Mock()
         )
 
 
