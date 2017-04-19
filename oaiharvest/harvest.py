@@ -48,6 +48,7 @@ import logging
 import os
 import platform
 import sys
+import traceback
 import six
 import six.moves.urllib.parse as urllib
 
@@ -303,6 +304,8 @@ def main(argv=None):
         except Exception as e:
             # Log error
             logger.error(str(e))
+            # Print traceback
+            traceback.print_exc(*sys.exc_info())
             # Continue to next provide without updating database lastHarvest
             continue
 
