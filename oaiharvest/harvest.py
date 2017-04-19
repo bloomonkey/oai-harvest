@@ -115,6 +115,9 @@ class DirectoryOAIHarvester(OAIHarvester):
 
     def harvest(self, baseUrl, metadataPrefix, **kwargs):
         """Harvest records, return if completed.
+        
+        :rtype: bool
+        :returns: Were all available records fetched and stored?
 
         Harvest records, output records to files in the directory and
         return a boolean for whether or not all of the records that the

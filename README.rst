@@ -87,7 +87,7 @@ in this README file!
 Requirements / Dependencies
 ---------------------------
 
-- Python_ >= 2.6 or Python 3.x
+- Python_ >= 2.7 or Python 3.x
 - pyoai_
 - lxml_
 - sqlite3_
