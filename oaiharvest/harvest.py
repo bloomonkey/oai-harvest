@@ -36,7 +36,7 @@ optional arguments:
                         place a limit on the number of records to harvest from
                         each provider
 
-Copyright © 2013, the University of Liverpool <http://www.liv.ac.uk>.
+Copyright (c) 2013, the University of Liverpool <http://www.liv.ac.uk>.
 All rights reserved.
 
 Distributed under the terms of the BSD 3-clause License
