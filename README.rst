@@ -82,11 +82,17 @@ in this README file!
 Requirements / Dependencies
 ---------------------------
 
-- Python_ >= 2.6
+- Python_ >= 2.6 or Python 3.x
 - pyoai_
 - lxml_
 - sqlite3_
 
+Note that Python 3.x support requires pyoai 2.4.6+.
+
+As this release is not yet available on PyPI, use
+``pip3 install git+https://github.com/infrae/pyoai.git``
+
+Python3 support is still in beta and might have some bugs.
 
 Installation
 ------------

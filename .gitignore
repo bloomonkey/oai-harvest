@@ -19,4 +19,6 @@ sdist
 develop-eggs
 .installed.cfg
 
-
+# Directories created by tox
+.eggs
+.tox
