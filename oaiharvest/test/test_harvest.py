@@ -7,8 +7,9 @@ Creator: john.harrison
 
 """
 import os
+import shutil
 import unittest
-from tempfile import TemporaryDirectory
+from tempfile import mkdtemp
 from uuid import uuid4
 
 from mock import Mock, patch
@@ -23,33 +24,32 @@ class DirectoryOAIHarvesterrTestCase(unittest.TestCase):
 
     def setUp(self):
         self.md_registry = Mock(spec_set=MetadataRegistry)
-        self.direcory = TemporaryDirectory()
+        self.dir_path = mkdtemp()
         self.harvester = DirectoryOAIHarvester(
             self.md_registry,
-            self.direcory.name
+            self.dir_path
         )
 
     def tearDown(self):
-        self.direcory.cleanup()
+        shutil.rmtree(self.dir_path)
 
     def test_init(self):
-        with TemporaryDirectory() as dir_path:
-            harvester = DirectoryOAIHarvester(
-                self.md_registry,
-                dir_path,
-                respectDeletions=False,
-                createSubDirs=True,
-                nRecs=10
-            )
-            self.assertIsInstance(harvester, OAIHarvester)
-            self.assertEqual(harvester._dir, dir_path)
-            self.assertFalse(harvester.respectDeletions)
-            self.assertTrue(harvester.createSubDirs)
-            self.assertEqual(harvester.nRecs, 10)
+        harvester = DirectoryOAIHarvester(
+            self.md_registry,
+            self.dir_path,
+            respectDeletions=False,
+            createSubDirs=True,
+            nRecs=10
+        )
+        self.assertIsInstance(harvester, OAIHarvester)
+        self.assertEqual(harvester._dir, self.dir_path)
+        self.assertFalse(harvester.respectDeletions)
+        self.assertTrue(harvester.createSubDirs)
+        self.assertEqual(harvester.nRecs, 10)
 
     def test_init_defaults(self):
         self.assertIsInstance(self.harvester, OAIHarvester)
-        self.assertEqual(self.harvester._dir, self.direcory.name)
+        self.assertEqual(self.harvester._dir, self.dir_path)
         self.assertTrue(self.harvester.respectDeletions)
         self.assertFalse(self.harvester.createSubDirs)
         self.assertEqual(self.harvester.nRecs, 0)
@@ -96,7 +96,7 @@ class DirectoryOAIHarvesterrTestCase(unittest.TestCase):
 
         self.assertTrue(self.harvester.harvest(url, 'oai_dc'))
         self.assertEqual(
-            len(os.listdir(self.direcory.name)),
+            len(os.listdir(self.dir_path)),
             len(mock_recs)
         )
 
