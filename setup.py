@@ -7,9 +7,6 @@ from setuptools import setup
 
 import oaiharvest
 
-# Check Python version
-py_version = getattr(sys, 'version_info', (0, 0, 0))
-
 # Basic information
 _name = "oaiharvest"
 _version = oaiharvest.__version__
@@ -25,9 +22,6 @@ with open('README.rst', 'r') as fh:
 # Requirements
 with open('requirements.txt', 'r') as fh:
     _install_requires = fh.readlines()
-
-if py_version < (2, 7):
-    _install_requires.append('argparse')
 
 
 # Setup
@@ -47,6 +41,10 @@ setup(
     requires=['lxml(>=2.1)', 'pyoai(>=2.4)'],
     install_requires=_install_requires,
     setup_requires=['setuptools-git'],
+    extras_require={
+        ':python_version=="2.6"': ['argparse'],
+        ':python_version=="2.7"': ['argparse'],
+    },
     entry_points={
         'console_scripts': [
             "oai-harvest = oaiharvest.harvest:main",
