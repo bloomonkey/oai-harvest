@@ -3,10 +3,6 @@
 from __future__ import with_statement
 
 import sys
-
-# Import Distribute / Setuptools
-import ez_setup
-ez_setup.use_setuptools()
 from setuptools import setup
 
 import oaiharvest
