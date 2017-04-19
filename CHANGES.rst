@@ -1,6 +1,36 @@
 CHANGES
 =======
 
+2.0.0 Wednesday 19th April 2017
+-------------------------------
+
+NEW FEATURES
+~~~~~~~~~~~~
+
+- Support for building a development virtualenv and testing builds using Tox_
+
+- Integration with `Travis CI`_
+
+
+ENHANCEMENTS
+~~~~~~~~~~~~
+
+- Now works in Python 3 (thanks to `@ulikoehler <https://github.com/ulikoehler>`_)
+
+- Allow providers with https transport scheme (thanks to
+  `@ulikoehler <https://github.com/ulikoehler>`_)
+
+
+1.2.0 Friday 30th December 2016
+-------------------------------
+
+BUG FIXES
+~~~~~~~~~
+
+- Fix build by using ``ez_setup.py`` instead of ``distribute_setup.py`` for
+  bootstrapping setuptools.
+
+
 1.1.5 Monday 28th April 2014
 ----------------------------
 
@@ -97,7 +127,11 @@ NEW FEATURES
     directory - for regular harvesting from a named provider
 
   - Specify provider using registered name when harvesting, or harvest
-    from all registered providers using the reserved name `all`
+    from all registered providers using the reserved name ``all``
 
   - Harvest only records modified since last harvest (unless overridden)
 
+
+.. Links
+.. _Travis CI: https://travis-ci.org/
+.. _Tox: https://tox.readthedocs.io/en/latest/

@@ -68,11 +68,6 @@ https://pypi.python.org/pypi/oaiharvest
    :target: https://pypi.python.org/pypi/oaiharvest
    :alt: Latest PyPI Version
 
-.. image:: https://pypip.in/d/oaiharvest/badge.png
-    :target: https://crate.io/packages/oaiharvest/
-    :alt: Number of PyPI downloads
-
-
 
 Source code is under version control and available from:
 
@@ -92,7 +87,7 @@ in this README file!
 Requirements / Dependencies
 ---------------------------
 
-- Python_ >= 2.6 or Python 3.x
+- Python_ >= 2.7 or Python 3.x
 - pyoai_
 - lxml_
 - sqlite3_
