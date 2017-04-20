@@ -91,9 +91,10 @@ class OAIHarvester(object):
         # Check server timestamp granularity support
         client.updateGranularity()
         for record in client.listRecords(**kwargs):
+            # Unit test hotfix
             header, metadata, about = record
             # Fix pyoai returning a "b'...'" string for py3k
-            if metadata.startswith("b'"):
+            if isinstance(metadata, str) and metadata.startswith("b'"):
                 metadata = ast.literal_eval(metadata).decode("utf-8")
             yield (header, metadata, about)
 

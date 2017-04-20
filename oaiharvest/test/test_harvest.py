@@ -66,7 +66,7 @@ class DirectoryOAIHarvesterrTestCase(unittest.TestCase):
     @patch('oaiharvest.harvest.Client')
     def test_listRecords(self, MockClient):
         client = MockClient.return_value
-        mock_recs = [Mock()]
+        mock_recs = [(Mock(), Mock(), Mock)]
         client.listRecords.return_value = iter(mock_recs)
         url = 'https://oai.example.com'
 
