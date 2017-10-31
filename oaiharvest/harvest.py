@@ -44,18 +44,19 @@ Distributed under the terms of the BSD 3-clause License
 """
 from __future__ import with_statement, absolute_import
 
+import ast
+import codecs
 import logging
 import os
 import platform
 import sys
-import six
-import six.moves.urllib.parse as urllib
-
 from argparse import ArgumentParser
 from datetime import datetime
 
+import six.moves.urllib.parse as urllib
 from oaipmh.client import Client
 from oaipmh.error import NoRecordsMatchError
+from six import string_types
 
 from .exceptions import NotOAIPMHBaseURLException
 from .metadata import DefaultingMetadataRegistry, XMLMetadataReader
@@ -88,7 +89,12 @@ class OAIHarvester(object):
         # Check server timestamp granularity support
         client.updateGranularity()
         for record in client.listRecords(**kwargs):
-            yield record
+            # Unit test hotfix
+            header, metadata, about = record
+            # Fix pyoai returning a "b'...'" string for py3k
+            if isinstance(metadata, str) and metadata.startswith("b'"):
+                metadata = ast.literal_eval(metadata).decode("utf-8")
+            yield (header, metadata, about)
 
     def harvest(self, baseUrl, metadataPrefix, **kwargs):
         "Harvest records"
@@ -114,6 +120,9 @@ class DirectoryOAIHarvester(OAIHarvester):
 
     def harvest(self, baseUrl, metadataPrefix, **kwargs):
         """Harvest records, return if completed.
+        
+        :rtype: bool
+        :returns: Were all available records fetched and stored?
 
         Harvest records, output records to files in the directory and
         return a boolean for whether or not all of the records that the
@@ -131,36 +140,13 @@ class DirectoryOAIHarvester(OAIHarvester):
                 logger.info("Stopping harvest; set limit of {0} has been "
                             "reached".format(self.nRecs))
                 break
-            filename = "{0}.{1}.xml".format(header.identifier(),
-                                            metadataPrefix
-                                            )
-            protected = []
-            if platform.system() != 'Windows':
-                protected.append(':')
-            if self.createSubDirs:
-                if isinstance(self.createSubDirs, basestring):
-                    # Replace specified character with platform path separator
-                    filename = filename.replace(self.createSubDirs,
-                                                os.path.sep
-                                                )
-                # Do not escape path separators, so that sub-directories
-                # can be created
-                protected.append(os.path.sep)
 
-            filename = urllib.quote(filename, ''.join(protected))
-            fp =  os.path.join(self._dir,
-                               filename
-                               )
-            if not os.path.isdir(os.path.dirname(fp)):
-                # Missing base directory or sub-directory
-                logger.debug("Creating target directory {0}"
-                             "".format(self._dir)
-                             )
-                os.makedirs(os.path.dirname(fp))
+            fp = self._get_output_filepath(header, metadataPrefix)
+            self._ensure_dir_exists(fp)
 
             if not header.isDeleted():
                 logger.debug('Writing to file {0}'.format(fp))
-                with open(fp, 'w') as fh:
+                with codecs.open(fp, "w", encoding="utf-8") as fh:
                     fh.write(metadata)
                 i += 1
             else:
@@ -182,6 +168,35 @@ class DirectoryOAIHarvester(OAIHarvester):
         # Loop must have been stopped with ``break``, e.g. due to
         # arbitrary limit
         return False
+
+    def _ensure_dir_exists(self, fp):
+        logger = logging.getLogger(__name__).getChild(self.__class__.__name__)
+        if not os.path.isdir(os.path.dirname(fp)):
+            # Missing base directory or sub-directory
+            logger.debug("Creating target directory {0}".format(self._dir))
+            os.makedirs(os.path.dirname(fp))
+
+    def _get_output_filepath(self, header, metadataPrefix):
+        filename = "{0}.{1}.xml".format(
+            header.identifier(),
+            metadataPrefix)
+
+        protected = []
+        if platform.system() != 'Windows':
+            protected.append(':')
+
+        if self.createSubDirs:
+            if isinstance(self.createSubDirs, string_types):
+                # Replace specified character with platform path separator
+                filename = filename.replace(self.createSubDirs, os.path.sep)
+
+            # Do not escape path separators, so that sub-directories
+            # can be created
+            protected.append(os.path.sep)
+
+        filename = urllib.quote(filename, ''.join(protected))
+        fp = os.path.join(self._dir, filename)
+        return fp
 
 
 def main(argv=None):
@@ -302,7 +317,7 @@ def main(argv=None):
                          )
         except Exception as e:
             # Log error
-            logger.error(str(e))
+            logger.error(str(e), exc_info=True)
             # Continue to next provide without updating database lastHarvest
             continue
 
@@ -320,89 +335,95 @@ def main(argv=None):
 # Set up argument parser
 docbits = __doc__.split('\n\n')
 
-argparser = ArgumentParser(description=docbits[0],
-                           epilog='\n\n'.join(docbits[-2:]))
-argparser.add_argument('--db', '--database',
-                       dest='databasePath',
-                       default=os.path.expanduser('~/.oai-harvest/registry.db'),
-                       help=("Path to provider registry database. Currently "
-                             "supports sqlite3 only.")
-                       )
-argparser.add_argument('provider',
-                       nargs='+',
-                       help=("OAI-PMH Provider from which to harvest. This may"
-                             " be the base URL of an OAI-PMH server, or the "
-                             "short name of a registered provider. You may "
-                             "also specify \"all\" for all registered "
-                             "providers.")
-                       )
-argparser.add_argument('-p', '--metadataPrefix',
-                       dest='metadataPrefix',
-                       help=("the metadataPrefix of the format (XML Schema) "
-                             "in which records should be harvested.")
-                       )
-argparser.add_argument("-f", "--from",
-                       dest="from_",
-                       metavar="YYYY-MM-DD",
-                       help=("harvest only records added/modified after this "
-                             "date.")
-                       )
-argparser.add_argument("-u", "--until",
-                       dest="until",
-                       metavar="YYYY-MM-DD",
-                       help=("harvest only records added/modified up to this "
-                             "date.")
-                       )
-argparser.add_argument("-s", "--set",
-                       dest="set",
-                       help=("harvest only records within this set")
-                       )
+argparser = ArgumentParser(
+    description=docbits[0],
+    epilog='\n\n'.join(docbits[-2:]))
+argparser.add_argument(
+    '--db',
+    '--database',
+    dest='databasePath',
+    default=os.path.expanduser('~/.oai-harvest/registry.db'),
+    help=("Path to provider registry database. Currently "
+          "supports sqlite3 only."))
+argparser.add_argument(
+    'provider',
+    nargs='+',
+    help=("OAI-PMH Provider from which to harvest. This may"
+          " be the base URL of an OAI-PMH server, or the "
+          "short name of a registered provider. You may "
+          "also specify \"all\" for all registered "
+          "providers."))
+argparser.add_argument(
+    '-p',
+    '--metadataPrefix',
+    dest='metadataPrefix',
+    help=("the metadataPrefix of the format (XML Schema) "
+          "in which records should be harvested."))
+argparser.add_argument(
+    "-f",
+    "--from",
+    dest="from_",
+    metavar="YYYY-MM-DD",
+    help=("harvest only records added/modified after this "
+          "date."))
+argparser.add_argument(
+    "-u",
+    "--until",
+    dest="until",
+    metavar="YYYY-MM-DD",
+    help=("harvest only records added/modified up to this "
+         "date."))
+argparser.add_argument(
+    "-s",
+    "--set",
+    dest="set",
+    help=("harvest only records within this set"))
 
 group = argparser.add_mutually_exclusive_group()
-group.add_argument('-d', '--dir',
-                   dest='dir',
-                   help=("where to output files for harvested records."
-                         "default: current working path")
-                   )
+group.add_argument(
+    '-d',
+    '--dir',
+    dest='dir',
+    help=("where to output files for harvested records."
+          "default: current working path"))
 # What to do about deletions
 group = argparser.add_mutually_exclusive_group()
 group.set_defaults(deletions=True)
-group.add_argument("--delete",
-                   action='store_true',
-                   dest='deletions',
-                   help=("respect the server's instructions regarding "
-                         "deletions, i.e. delete the files locally (default)")
-                   )
-group.add_argument("--no-delete",
-                   action='store_false',
-                   dest='deletions',
-                   help=("ignore the server's instructions regarding "
-                         "deletions, i.e. DO NOT delete the files locally")
-                   )
-argparser.add_argument("-l", "--limit",
-                       dest="limit",
-                       type=int,
-                       help=("place a limit on the number of records to "
-                             "harvest from each provider")
-                       )
+group.add_argument(
+    "--delete",
+    action='store_true',
+    dest='deletions',
+    help=("respect the server's instructions regarding "
+          "deletions, i.e. delete the files locally (default)"))
+group.add_argument(
+    "--no-delete",
+    action='store_false',
+    dest='deletions',
+    help=("ignore the server's instructions regarding "
+          "deletions, i.e. DO NOT delete the files locally"))
+argparser.add_argument(
+    "-l",
+    "--limit",
+    dest="limit",
+    type=int,
+    help="limit the number of records to harvest from each provider")
 # What to do about sub-directories
 group = argparser.add_mutually_exclusive_group()
 group.set_defaults(subdirs=None)
-group.add_argument("--create-subdirs",
-                   action='store_true',
-                   dest='subdirs',
-                   help=("create target subdirs (based on / characters in "
-                         "identifiers) if they don't exist. To use something "
-                         "other than /, use the newer --subdirs-on option"
-                         )
+group.add_argument(
+    "--create-subdirs",
+    action='store_true',
+    dest='subdirs',
+    help=("create target subdirs (based on / characters in identifiers) if"
+          "they don't exist. To use something other than /, use the newer"
+          "--subdirs-on option")
                    )
-group.add_argument("--subdirs-on",
-                   action='store',
-                   dest='subdirs',
-                   help=("create target subdirs based on occurrences of the "
-                         "given character in identifiers"
-                         )
-                   )
+group.add_argument(
+    "--subdirs-on",
+    action='store',
+    dest='subdirs',
+    help=("create target subdirs based on occurrences of the given character"
+          "in identifiers"))
 
 
 # Set up metadata registry
@@ -419,8 +440,8 @@ logging.basicConfig(
     level=logging.DEBUG,
     format='%(asctime)s %(name)-16s %(levelname)-8s %(message)s',
     datefmt='[%Y-%m-%d %H:%M:%S]',
-    filename=os.path.join(appdir, 'harvest.log')
-)
+    filename=os.path.join(appdir, 'harvest.log'))
+
 ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(levelname)-8s %(message)s')
