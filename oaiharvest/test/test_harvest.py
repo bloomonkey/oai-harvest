@@ -13,14 +13,15 @@ from tempfile import mkdtemp
 from uuid import uuid4
 
 from mock import Mock, patch
-from oaipmh.common import Header, Metadata
+from oaipmh.common import Header
 from oaipmh.metadata import MetadataRegistry
+from six import PY3
 
 from oaiharvest.exceptions import NotOAIPMHBaseURLException
 from oaiharvest.harvest import OAIHarvester, DirectoryOAIHarvester
 
 
-class DirectoryOAIHarvesterrTestCase(unittest.TestCase):
+class DirectoryOAIHarvesterTestCase(unittest.TestCase):
 
     def setUp(self):
         self.md_registry = Mock(spec_set=MetadataRegistry)
@@ -106,11 +107,12 @@ class DirectoryOAIHarvesterrTestCase(unittest.TestCase):
         header = Mock(spec_set=Header)
         header.identifier.return_value = uuid4()
         header.isDeleted.return_value = False
-        return (
-            header,
-            "<xml>data</xml>",
-            Mock()
-        )
+        if PY3:
+            body = "<xml>data ü</xml>"
+        else:
+            body = u"<xml>data ü</xml>"
+
+        return (header, body, Mock())
 
 
 if __name__ == '__main__':
