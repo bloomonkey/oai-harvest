@@ -1,6 +1,22 @@
 CHANGES
 =======
 
+3.0.0 Tuesday 31 October 2017
+-----------------------------
+
+REMOVED
+~~~~~~~
+
+- Support for Python 2.6
+
+BUG FIXES
+~~~~~~~~~
+
+- Log complete traceback on errors
+- Decode binary metadata string returned by pyoai in Python 3
+- Output files as UTF-8
+
+
 2.0.0 Wednesday 19th April 2017
 -------------------------------
 
