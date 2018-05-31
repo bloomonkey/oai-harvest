@@ -158,7 +158,7 @@ Copyright And Licensing
 
 Copyright (c) `University of Liverpool`_, 2013-2014
 
-See `LICENSE.rst <LICENSE.rst>`_ for licensing details.
+This project is licensed under the terms of the `3-Clause BSD License <LICENSE.md>`_.
 
 
 Examples
