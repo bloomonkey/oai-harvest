@@ -120,7 +120,7 @@ class DirectoryOAIHarvester(OAIHarvester):
 
     def harvest(self, baseUrl, metadataPrefix, **kwargs):
         """Harvest records, return if completed.
-        
+
         :rtype: bool
         :returns: Were all available records fetched and stored?
 
@@ -207,11 +207,6 @@ def main(argv=None):
     else:
         args = argparser.parse_args(argv)
     logger = logging.getLogger(__name__).getChild('main')
-    # Parse from and until into datetime objects
-    if args.from_ is not None:
-        args.from_ = datetime.strptime(args.from_, "%Y-%m-%d")
-    if args.until is not None:
-        args.until = datetime.strptime(args.until, "%Y-%m-%d")
     # Establish connection to persistent storage
     cxn = verify_database(args.databasePath)
     # Make a set of providers - don't repeat for repeated arguments
@@ -332,6 +327,11 @@ def main(argv=None):
                         "available from the server")
 
 
+def parse_date(argument):
+    """ Date parser to be used as type argument for argparser options. """
+    return datetime.strptime(argument, "%Y-%m-%d")
+
+
 # Set up argument parser
 docbits = __doc__.split('\n\n')
 
@@ -362,6 +362,7 @@ argparser.add_argument(
 argparser.add_argument(
     "-f",
     "--from",
+    type=parse_date,
     dest="from_",
     metavar="YYYY-MM-DD",
     help=("harvest only records added/modified after this "
@@ -369,6 +370,7 @@ argparser.add_argument(
 argparser.add_argument(
     "-u",
     "--until",
+    type=parse_date,
     dest="until",
     metavar="YYYY-MM-DD",
     help=("harvest only records added/modified up to this "
