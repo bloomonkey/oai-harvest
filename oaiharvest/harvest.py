@@ -51,7 +51,8 @@ import os
 import platform
 import sys
 from argparse import ArgumentParser
-from datetime import datetime
+from datetime import datetime, timedelta
+from time import sleep
 
 import six.moves.urllib.parse as urllib
 from oaipmh.client import Client
@@ -73,11 +74,33 @@ class OAIHarvester(object):
     def __init__(self, mdRegistry):
         self._mdRegistry = mdRegistry
 
+    def pause(self, now, until):
+        """ Unconditionally pause the process from `now` to `until`. """
+        logger = logging.getLogger(__name__).getChild('OAIHarvester.pause')
+        logger.info('Pausing until {} (incremental harvest).'.format(until))
+        sleep((until - now) / timedelta(seconds=1))
+
+    def maybe_pause_if_incremental(self, time_range):
+        """ Pause the process depending on incremental time range settings. """
+        if time_range is None:
+            return
+        now = datetime.now()
+        start = datetime.combine(now.date(), time_range[0].time())
+        stop = datetime.combine(now.date(), time_range[1].time())
+        if now < start:
+            if now < stop < start:
+                return
+            return self.pause(now, start)
+        if start < stop <= now:
+            return self.pause(now, start + timedelta(days=1))
+        # If we reach this point, there is no need to pause.
+
     def _listRecords(self, baseUrl, metadataPrefix="oai_dc", **kwargs):
         # Generator to yield records from baseUrl in the given metadataPrefix
         # Add metatdataPrefix to args
         kwargs['metadataPrefix'] = metadataPrefix
         client = Client(baseUrl, self._mdRegistry)
+        incremental_range = kwargs.pop('between', None)
         # Check that baseUrl actually represents an OAI-PMH target
         try:
             client.identify()
@@ -88,6 +111,7 @@ class OAIHarvester(object):
             )
         # Check server timestamp granularity support
         client.updateGranularity()
+        self.maybe_pause_if_incremental(incremental_range)
         for record in client.listRecords(**kwargs):
             # Unit test hotfix
             header, metadata, about = record
@@ -95,6 +119,7 @@ class OAIHarvester(object):
             if isinstance(metadata, str) and metadata.startswith("b'"):
                 metadata = ast.literal_eval(metadata).decode("utf-8")
             yield (header, metadata, about)
+            self.maybe_pause_if_incremental(incremental_range)
 
     def harvest(self, baseUrl, metadataPrefix, **kwargs):
         "Harvest records"
@@ -294,6 +319,8 @@ def main(argv=None):
 
         if args.set is not None:
             kwargs['set'] = args.set
+        if args.between is not None:
+            kwargs['between'] = args.between
         try:
             completed = harvester.harvest(baseUrl,
                                           args.metadataPrefix,
@@ -330,6 +357,11 @@ def main(argv=None):
 def parse_date(argument):
     """ Date parser to be used as type argument for argparser options. """
     return datetime.strptime(argument, "%Y-%m-%d")
+
+
+def parse_time(argument):
+    """ Time parser to be used as type argument for argparser options. """
+    return datetime.strptime(argument, "%H:%M")
 
 
 # Set up argument parser
@@ -380,6 +412,15 @@ argparser.add_argument(
     "--set",
     dest="set",
     help=("harvest only records within this set"))
+argparser.add_argument(
+    '-b',
+    '--between',
+    type=parse_time,
+    nargs=2,
+    metavar='HH:MM',
+    help=('harvest only between the first and the second wall clock time '
+        '(enables incremental harvesting)'),
+)
 
 group = argparser.add_mutually_exclusive_group()
 group.add_argument(
