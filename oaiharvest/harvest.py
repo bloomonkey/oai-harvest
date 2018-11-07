@@ -1,10 +1,10 @@
 # encoding: utf-8
 """Harvest records from an OAI-PMH provider.
 
-usage: %prog [-h] [--db DATABASEPATH] [-p METADATAPREFIX]
-             [-f YYYY-MM-DD] [-u YYYY-MM-DD] [-s SET] [-d DIR]
-             [--delete | --no-delete]
-             [-l LIMIT]
+usage: %prog [-h] [--db DATABASEPATH] [-p METADATAPREFIX] [-f YYYY-MM-DD]
+             [-u YYYY-MM-DD] [-s SET] [-b HH:MM HH:MM] [-d DIR]
+             [--delete | --no-delete] [-l LIMIT]
+             [--create-subdirs | --subdirs-on SUBDIRS]
              provider [provider ...]
 
 positional arguments:
@@ -26,6 +26,9 @@ optional arguments:
   -u YYYY-MM-DD, --until YYYY-MM-DD
                         harvest only records added/modified up to this date.
   -s SET, --set SET     harvest only records within this set
+  -b HH:MM HH:MM, --between HH:MM HH:MM
+                        harvest only between the first and the second wall
+                        clock time (enables incremental harvesting)
   -d DIR, --dir DIR     where to output files for harvested records.default:
                         current working path
   --delete              respect the server's instructions regarding deletions,
@@ -33,8 +36,13 @@ optional arguments:
   --no-delete           ignore the server's instructions regarding deletions,
                         i.e. DO NOT delete the files locally
   -l LIMIT, --limit LIMIT
-                        place a limit on the number of records to harvest from
-                        each provider
+                        limit the number of records to harvest from each
+                        provider
+  --create-subdirs      create target subdirs (based on / characters in
+                        identifiers) ifthey don't exist. To use something
+                        other than /, use the newer--subdirs-on option
+  --subdirs-on SUBDIRS  create target subdirs based on occurrences of the
+                        given characterin identifiers
 
 Copyright (c) 2013, the University of Liverpool <http://www.liv.ac.uk>.
 All rights reserved.
