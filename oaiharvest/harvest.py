@@ -1,9 +1,9 @@
 # encoding: utf-8
 """Harvest records from an OAI-PMH provider.
 
-usage: %prog [-h] [--db DATABASEPATH] [-p METADATAPREFIX] [-f YYYY-MM-DD]
-             [-u YYYY-MM-DD] [-s SET] [-b HH:MM HH:MM] [-d DIR]
-             [--delete | --no-delete] [-l LIMIT]
+usage: %prog [-h] [--db DATABASEPATH] [-p METADATAPREFIX] [-r TOKEN]
+             [-f YYYY-MM-DD] [-u YYYY-MM-DD] [-s SET] [-b HH:MM HH:MM]
+             [-d DIR] [--delete | --no-delete] [-l LIMIT]
              [--create-subdirs | --subdirs-on SUBDIRS]
              provider [provider ...]
 
@@ -21,6 +21,8 @@ optional arguments:
   -p METADATAPREFIX, --metadataPrefix METADATAPREFIX
                         the metadataPrefix of the format (XML Schema) in which
                         records should be harvested.
+  -r TOKEN, --resume-from TOKEN
+                        start at the given resumption TOKEN
   -f YYYY-MM-DD, --from YYYY-MM-DD
                         harvest only records added/modified after this date.
   -u YYYY-MM-DD, --until YYYY-MM-DD
@@ -106,7 +108,8 @@ class OAIHarvester(object):
     def _listRecords(self, baseUrl, metadataPrefix="oai_dc", **kwargs):
         # Generator to yield records from baseUrl in the given metadataPrefix
         # Add metatdataPrefix to args
-        kwargs['metadataPrefix'] = metadataPrefix
+        if 'resumptionToken' not in kwargs:
+            kwargs['metadataPrefix'] = metadataPrefix
         client = Client(baseUrl, self._mdRegistry)
         incremental_range = kwargs.pop('between', None)
         # Check that baseUrl actually represents an OAI-PMH target
@@ -287,7 +290,7 @@ def main(argv=None):
             if args.from_ is not None:
                 logger.warning('Value for command line option --from'
                                ' over-rides recorded lastHarvest timestamp')
-            else:
+            elif args.resumptionToken is None:
                 args.from_ = row[3]
         else:
             baseUrl = provider
@@ -329,6 +332,8 @@ def main(argv=None):
             kwargs['set'] = args.set
         if args.between is not None:
             kwargs['between'] = args.between
+        if args.resumptionToken is not None:
+            kwargs['resumptionToken'] = args.resumptionToken
         try:
             completed = harvester.harvest(baseUrl,
                                           args.metadataPrefix,
@@ -399,6 +404,13 @@ argparser.add_argument(
     dest='metadataPrefix',
     help=("the metadataPrefix of the format (XML Schema) "
           "in which records should be harvested."))
+argparser.add_argument(
+    '-r',
+    '--resume-from',
+    dest='resumptionToken',
+    metavar='TOKEN',
+    help='start at the given resumption TOKEN',
+)
 argparser.add_argument(
     "-f",
     "--from",
