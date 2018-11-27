@@ -108,8 +108,7 @@ class OAIHarvester(object):
     def _listRecords(self, baseUrl, metadataPrefix="oai_dc", **kwargs):
         # Generator to yield records from baseUrl in the given metadataPrefix
         # Add metatdataPrefix to args
-        if 'resumptionToken' not in kwargs:
-            kwargs['metadataPrefix'] = metadataPrefix
+        kwargs['metadataPrefix'] = metadataPrefix
         client = Client(baseUrl, self._mdRegistry)
         incremental_range = kwargs.pop('between', None)
         # Check that baseUrl actually represents an OAI-PMH target
