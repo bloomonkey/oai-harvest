@@ -109,7 +109,7 @@ class OAIHarvester(object):
         # Generator to yield records from baseUrl in the given metadataPrefix
         # Add metatdataPrefix to args
         kwargs['metadataPrefix'] = metadataPrefix
-        client = Client(baseUrl, self._mdRegistry)
+        client = Client(baseUrl, self._mdRegistry, recover=True)
         incremental_range = kwargs.pop('between', None)
         # Check that baseUrl actually represents an OAI-PMH target
         try:
@@ -508,8 +508,10 @@ ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(levelname)-8s %(message)s')
 ch.setFormatter(formatter)
-logging.getLogger(__name__).addHandler(ch)
+logging.getLogger().addHandler(ch)
 
+from lxml import etree
+etree.use_global_python_log(etree.PyErrorLog())
 
 if __name__ == "__main__":
     sys.exit(main())
