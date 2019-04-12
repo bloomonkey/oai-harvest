@@ -340,14 +340,19 @@ if not os.path.exists(appdir):
 # Set up logger
 logging.basicConfig(
     level=logging.DEBUG,
-    format='%(asctime)s %(name)-16s %(levelname)-8s %(message)s',
-    datefmt='[%Y-%m-%d %H:%M:%S]',
-    filename=os.path.join(appdir, 'registry.log')
+    format='%(levelname)-8s %(message)s'
+    # format='%(asctime)s %(name)-16s %(levelname)-8s %(message)s',
+    # datefmt='[%Y-%m-%d %H:%M:%S]',
+    # filename=os.path.join(appdir, 'registry.log')
 )
 logger = logging.getLogger(__name__)
-ch = logging.StreamHandler()
+# ch = logging.StreamHandler()
+ch = logging.FileHandler( os.path.join( appdir, 'registry.log'))
 ch.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(levelname)-8s %(message)s')
+# formatter = logging.Formatter('%(levelname)-8s %(message)s')
+formatter = logging.Formatter(
+    '%(asctime)s %(name)-16s %(levelname)-8s %(message)s',
+    '[%Y-%m-%d %H:%M:%S]' )
 ch.setFormatter(formatter)
 logger.addHandler(ch)
 

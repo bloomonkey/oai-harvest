@@ -500,18 +500,25 @@ if not os.path.exists(appdir):
 # Set up logger
 logging.basicConfig(
     level=logging.DEBUG,
-    format='%(asctime)s %(name)-16s %(levelname)-8s %(message)s',
-    datefmt='[%Y-%m-%d %H:%M:%S]',
-    filename=os.path.join(appdir, 'harvest.log'))
+    format='%(levelname)-8s %(message)s',
+    # format='%(asctime)s %(name)-16s %(levelname)-8s %(message)s',
+    # datefmt='[%Y-%m-%d %H:%M:%S]',
+    # filename=os.path.join(appdir, 'harvest.log')
+    )
 
-ch = logging.StreamHandler()
+#ch = logging.StreamHandler()
+ch = logging.FileHandler( os.path.join( appdir, 'harvest.log'))
 ch.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(levelname)-8s %(message)s')
+formatter = logging.Formatter(
+    '%(asctime)s %(name)-16s %(levelname)-8s %(message)s',
+    '[%Y-%m-%d %H:%M:%S]')
+#formatter = logging.Formatter('%(levelname)-8s %(message)s')
 ch.setFormatter(formatter)
-logging.getLogger().addHandler(ch)
+logging.getLogger(__name__).addHandler(ch)
 
 from lxml import etree
-etree.use_global_python_log(etree.PyErrorLog())
+
+etree.use_global_python_log(etree.PyErrorLog(logger=logging.getLogger(__name__).getChild('XMLParser')))
 
 if __name__ == "__main__":
     sys.exit(main())
