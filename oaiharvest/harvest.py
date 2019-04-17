@@ -129,6 +129,9 @@ class OAIHarvester(object):
             if isinstance(metadata, str) and metadata.startswith("b'"):
                 metadata = ast.literal_eval(metadata).decode("utf-8")
             yield (header, metadata, about)
+            if client.XMLParser.error_log :
+                logging.getLogger(__name__).getChild('XMLParser').warning(
+                'Recoverable XMLParser error on: %s', header.identifier() )
             self.maybe_pause_if_incremental(incremental_range)
 
     def harvest(self, baseUrl, metadataPrefix, **kwargs):
@@ -518,7 +521,19 @@ logging.getLogger(__name__).addHandler(ch)
 
 from lxml import etree
 
-etree.use_global_python_log(etree.PyErrorLog(logger=logging.getLogger(__name__).getChild('XMLParser')))
+class XMLErrorLog( etree.PyErrorLog ):
+    new_map = { 1: 30, 2: 30, 3: 30 }
+    def __init__( self, *args, **kwargs ):
+        etree.PyErrorLog.__init__( self, *args, **kwargs )
+        self.level_map.update( self.new_map )
+    def receive(self, log_entry ):
+        logrepr = "%s:%d:%d:%s%s.%s:[%s]" % (
+            log_entry.filename, log_entry.line, log_entry.column, "",
+            log_entry.domain_name, log_entry.type_name, log_entry.message)
+        self.log( log_entry, logrepr )
+
+etree.use_global_python_log(XMLErrorLog(logger=logging.getLogger(__name__).getChild('XMLParser')))
+
 
 if __name__ == "__main__":
     sys.exit(main())
