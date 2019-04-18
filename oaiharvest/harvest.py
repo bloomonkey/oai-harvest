@@ -339,7 +339,7 @@ def main(argv=None):
         try:
             completed = harvester.harvest(baseUrl,
                                           args.metadataPrefix,
-                                          recover=True,
+                                          recover=args.recover,
                                           **kwargs
                                           )
         except NoRecordsMatchError:
@@ -491,6 +491,19 @@ group.add_argument(
     help=("create target subdirs based on occurrences of the given character"
           "in identifiers"))
 
+# XMLParser( recover=? )
+group = argparser.add_mutually_exclusive_group(required=False)
+group.set_defaults(recover=True)
+group.add_argument(
+    '--recover',
+    action='store_true',
+    dest='recover',
+ )
+group.add_argument(
+    '--no-recover',
+    action='store_false',
+    dest='recover',
+ )
 
 # Set up metadata registry
 xmlReader = XMLMetadataReader()
@@ -523,7 +536,11 @@ logging.getLogger(__name__).addHandler(ch)
 from lxml import etree
 
 class XMLErrorLog( etree.PyErrorLog ):
-    new_map = { 1: 30, 2: 30, 3: 30 }
+    new_map = {
+       etree.ErrorLevels.WARNING : logging.WARNING,
+       etree.ErrorLevels.ERROR   : logging.WARNING,
+       etree.ErrorLevels.FATAL   : logging.WARNING,
+        }
     def __init__( self, *args, **kwargs ):
         etree.PyErrorLog.__init__( self, *args, **kwargs )
         self.level_map.update( self.new_map )
