@@ -109,7 +109,7 @@ class OAIHarvester(object):
         # Generator to yield records from baseUrl in the given metadataPrefix
         # Add metatdataPrefix to args
         kwargs['metadataPrefix'] = metadataPrefix
-        client = Client(baseUrl, self._mdRegistry, recover=True)
+        client = Client(baseUrl, self._mdRegistry, recover=kwargs.pop('recover', False))
         incremental_range = kwargs.pop('between', None)
         # Check that baseUrl actually represents an OAI-PMH target
         try:
@@ -339,6 +339,7 @@ def main(argv=None):
         try:
             completed = harvester.harvest(baseUrl,
                                           args.metadataPrefix,
+                                          recover=True,
                                           **kwargs
                                           )
         except NoRecordsMatchError:
