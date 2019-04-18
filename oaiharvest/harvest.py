@@ -498,6 +498,8 @@ group.add_argument(
     '--recover',
     action='store_true',
     dest='recover',
+    help=("create XMLParser with (recover=True) option: "
+        "parser will try to continue to parse broken XML payloads")
  )
 group.add_argument(
     '--no-recover',
