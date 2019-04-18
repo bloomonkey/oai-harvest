@@ -65,7 +65,7 @@ from datetime import datetime, timedelta
 from time import sleep
 
 import six.moves.urllib.parse as urllib
-from oaipmh.client import Client
+from .client import Client
 from oaipmh.error import NoRecordsMatchError
 from six import string_types
 
