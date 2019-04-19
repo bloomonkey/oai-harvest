@@ -450,7 +450,7 @@ group.add_argument(
     '-d',
     '--dir',
     dest='dir',
-    help=("where to output files for harvested records."
+    help=("where to output files for harvested records. "
           "default: current working path"))
 # What to do about deletions
 group = argparser.add_mutually_exclusive_group()
@@ -480,7 +480,7 @@ group.add_argument(
     "--create-subdirs",
     action='store_true',
     dest='subdirs',
-    help=("create target subdirs (based on / characters in identifiers) if"
+    help=("create target subdirs (based on / characters in identifiers) if "
           "they don't exist. To use something other than /, use the newer"
           "--subdirs-on option")
                    )
@@ -493,7 +493,7 @@ group.add_argument(
 
 # XMLParser( recover=? )
 group = argparser.add_mutually_exclusive_group(required=False)
-group.set_defaults(recover=True)
+group.set_defaults(recover=False)
 group.add_argument(
     '--recover',
     action='store_true',
@@ -505,6 +505,7 @@ group.add_argument(
     '--no-recover',
     action='store_false',
     dest='recover',
+    help=( "default is --no-recover" )
  )
 
 # Set up metadata registry
