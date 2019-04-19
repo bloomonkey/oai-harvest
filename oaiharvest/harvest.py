@@ -129,7 +129,7 @@ class OAIHarvester(object):
             if isinstance(metadata, str) and metadata.startswith("b'"):
                 metadata = ast.literal_eval(metadata).decode("utf-8")
             yield (header, metadata, about)
-            if client.XMLParser.error_log :
+            if client.XMLParser.error_log and len(client.XMLParser.error_log) > 0 :
                 logging.getLogger(__name__).getChild('XMLParser').warning(
                 'Recoverable XMLParser error on: %s', header.identifier() )
             self.maybe_pause_if_incremental(incremental_range)
