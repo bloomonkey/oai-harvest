@@ -45,6 +45,10 @@ optional arguments:
                         other than /, use the newer--subdirs-on option
   --subdirs-on SUBDIRS  create target subdirs based on occurrences of the
                         given characterin identifiers
+  --recover             create XMLParser with (recover=True) option: parser
+                        will try to continue to parse broken XML payloads
+  --no-recover          default is --no-recover
+
 
 Copyright (c) 2013, the University of Liverpool <http://www.liv.ac.uk>.
 All rights reserved.
@@ -129,7 +133,7 @@ class OAIHarvester(object):
             if isinstance(metadata, str) and metadata.startswith("b'"):
                 metadata = ast.literal_eval(metadata).decode("utf-8")
             yield (header, metadata, about)
-            if client.XMLParser.error_log and len(client.XMLParser.error_log) > 0 :
+            if client.XMLParser.error_log and len(client.XMLParser.error_log) > 0:
                 logging.getLogger(__name__).getChild('XMLParser').warning(
                 'Recoverable XMLParser error on: %s', header.identifier() )
             self.maybe_pause_if_incremental(incremental_range)
@@ -521,9 +525,6 @@ if not os.path.exists(appdir):
 logging.basicConfig(
     level=logging.DEBUG,
     format='%(levelname)-8s %(message)s',
-    # format='%(asctime)s %(name)-16s %(levelname)-8s %(message)s',
-    # datefmt='[%Y-%m-%d %H:%M:%S]',
-    # filename=os.path.join(appdir, 'harvest.log')
     )
 
 #ch = logging.StreamHandler()
@@ -532,7 +533,6 @@ ch.setLevel(logging.DEBUG)
 formatter = logging.Formatter(
     '%(asctime)s %(name)-16s %(levelname)-8s %(message)s',
     '[%Y-%m-%d %H:%M:%S]')
-#formatter = logging.Formatter('%(levelname)-8s %(message)s')
 ch.setFormatter(formatter)
 logging.getLogger(__name__).addHandler(ch)
 

@@ -45,10 +45,10 @@ MAX_NAME_LENGTH = 15
 
 def add_provider(cxn, args):
     """Add a new provider to the registry database.
-    
+
     Process ``args`` to add a new provider to the registry database. Return 0
     for success, 1 for failure (error message should be logged).
-    
+
     ``cxn`` => instance of ``sqlite3.Connection``
     ``args`` => instance of ``argparse.Namespace``
     """
@@ -148,10 +148,10 @@ def add_provider(cxn, args):
 
 def rm_provider(cxn, args):
     """Remove existing provider(s) from the registry database.
-    
+
     Process ``args`` to remove provider(s) to the registry database. Return 0
     for success, 1 for failure (error message should be logged).
-    
+
     ``cxn`` => instance of ``sqlite3.Connection``
     ``args`` => instance of ``argparse.Namespace``
     """
@@ -174,10 +174,10 @@ def rm_provider(cxn, args):
 
 def list_providers(cxn, args):
     """List provider(s) currently in the registry database.
-    
+
     Process ``args`` to remove provider(s) to the registry database. Return 0
     for success, 1 for failure (error message should be logged).
-    
+
     ``cxn`` => instance of ``sqlite3.Connection``
     ``args`` => instance of ``argparse.Namespace``
     """
@@ -228,7 +228,7 @@ def verify_database(path):
         return 1
     # Verify that table exists
     try:
-        
+
         cxn.execute('SELECT name FROM providers')
     except sqlite3.OperationalError:
         # Create the table
@@ -341,15 +341,10 @@ if not os.path.exists(appdir):
 logging.basicConfig(
     level=logging.DEBUG,
     format='%(levelname)-8s %(message)s'
-    # format='%(asctime)s %(name)-16s %(levelname)-8s %(message)s',
-    # datefmt='[%Y-%m-%d %H:%M:%S]',
-    # filename=os.path.join(appdir, 'registry.log')
 )
 logger = logging.getLogger(__name__)
-# ch = logging.StreamHandler()
 ch = logging.FileHandler( os.path.join( appdir, 'registry.log'))
 ch.setLevel(logging.DEBUG)
-# formatter = logging.Formatter('%(levelname)-8s %(message)s')
 formatter = logging.Formatter(
     '%(asctime)s %(name)-16s %(levelname)-8s %(message)s',
     '[%Y-%m-%d %H:%M:%S]' )
