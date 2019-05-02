@@ -49,6 +49,7 @@ class BaseClient(common.OAIPMH):
         if custom_retry_policy is not None:
             self.retry_policy.update(custom_retry_policy)
         self.XMLParser = etree.XMLParser(recover=recover)
+        self.recover = recover
 
     def updateGranularity(self):
         """Update the granularity setting dependent on that the server says.
@@ -230,10 +231,15 @@ class BaseClient(common.OAIPMH):
         # first find resumption token if available
         evaluator = etree.XPathEvaluator(tree,
                                          namespaces=namespaces)
-        token = evaluator.evaluate(
-            'string(/oai:OAI-PMH/*/oai:resumptionToken/text())')
+        if self.recover :
+            token = evaluator.evaluate(
+                'string(//oai:resumptionToken/text())')
+        else:
+            token = evaluator.evaluate(
+                'string(/oai:OAI-PMH/*/oai:resumptionToken/text())')
         if token.strip() == '':
             token = None
+
         record_nodes = evaluator.evaluate(
             '/oai:OAI-PMH/*/oai:record')
         result = []
