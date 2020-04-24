@@ -50,6 +50,7 @@ class XMLMetadataReader(object):
           [six.text_type(
               tostring(rec_element,
                     method="xml",
+                    encoding="unicode",
                     pretty_print=True))
            for rec_element
            in metadata_element])
