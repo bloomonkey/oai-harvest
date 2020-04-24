@@ -45,6 +45,10 @@ optional arguments:
                         other than /, use the newer--subdirs-on option
   --subdirs-on SUBDIRS  create target subdirs based on occurrences of the
                         given characterin identifiers
+  --recover             create XMLParser with (recover=True) option: parser
+                        will try to continue to parse broken XML payloads
+  --no-recover          default is --no-recover
+
 
 Copyright (c) 2013, the University of Liverpool <http://www.liv.ac.uk>.
 All rights reserved.
@@ -65,7 +69,7 @@ from datetime import datetime, timedelta
 from time import sleep
 
 import six.moves.urllib.parse as urllib
-from oaipmh.client import Client
+from .client import Client
 from oaipmh.error import NoRecordsMatchError
 from six import string_types
 
@@ -109,7 +113,7 @@ class OAIHarvester(object):
         # Generator to yield records from baseUrl in the given metadataPrefix
         # Add metatdataPrefix to args
         kwargs['metadataPrefix'] = metadataPrefix
-        client = Client(baseUrl, self._mdRegistry)
+        client = Client(baseUrl, self._mdRegistry, recover=kwargs.pop('recover', False))
         incremental_range = kwargs.pop('between', None)
         # Check that baseUrl actually represents an OAI-PMH target
         try:
@@ -129,6 +133,9 @@ class OAIHarvester(object):
             if isinstance(metadata, str) and metadata.startswith("b'"):
                 metadata = ast.literal_eval(metadata).decode("utf-8")
             yield (header, metadata, about)
+            if client.XMLParser.error_log and len(client.XMLParser.error_log) > 0:
+                logging.getLogger(__name__).getChild('XMLParser').warning(
+                'Recoverable XMLParser error on: %s', header.identifier() )
             self.maybe_pause_if_incremental(incremental_range)
 
     def harvest(self, baseUrl, metadataPrefix, **kwargs):
@@ -336,6 +343,7 @@ def main(argv=None):
         try:
             completed = harvester.harvest(baseUrl,
                                           args.metadataPrefix,
+                                          recover=args.recover,
                                           **kwargs
                                           )
         except NoRecordsMatchError:
@@ -446,7 +454,7 @@ group.add_argument(
     '-d',
     '--dir',
     dest='dir',
-    help=("where to output files for harvested records."
+    help=("where to output files for harvested records. "
           "default: current working path"))
 # What to do about deletions
 group = argparser.add_mutually_exclusive_group()
@@ -476,7 +484,7 @@ group.add_argument(
     "--create-subdirs",
     action='store_true',
     dest='subdirs',
-    help=("create target subdirs (based on / characters in identifiers) if"
+    help=("create target subdirs (based on / characters in identifiers) if "
           "they don't exist. To use something other than /, use the newer"
           "--subdirs-on option")
                    )
@@ -487,6 +495,22 @@ group.add_argument(
     help=("create target subdirs based on occurrences of the given character"
           "in identifiers"))
 
+# XMLParser( recover=? )
+group = argparser.add_mutually_exclusive_group(required=False)
+group.set_defaults(recover=False)
+group.add_argument(
+    '--recover',
+    action='store_true',
+    dest='recover',
+    help=("create XMLParser with (recover=True) option: "
+        "parser will try to continue to parse broken XML payloads")
+ )
+group.add_argument(
+    '--no-recover',
+    action='store_false',
+    dest='recover',
+    help=( "default is --no-recover" )
+ )
 
 # Set up metadata registry
 xmlReader = XMLMetadataReader()
@@ -500,15 +524,36 @@ if not os.path.exists(appdir):
 # Set up logger
 logging.basicConfig(
     level=logging.DEBUG,
-    format='%(asctime)s %(name)-16s %(levelname)-8s %(message)s',
-    datefmt='[%Y-%m-%d %H:%M:%S]',
-    filename=os.path.join(appdir, 'harvest.log'))
+    format='%(levelname)-8s %(message)s',
+    )
 
-ch = logging.StreamHandler()
+#ch = logging.StreamHandler()
+ch = logging.FileHandler( os.path.join( appdir, 'harvest.log'))
 ch.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(levelname)-8s %(message)s')
+formatter = logging.Formatter(
+    '%(asctime)s %(name)-16s %(levelname)-8s %(message)s',
+    '[%Y-%m-%d %H:%M:%S]')
 ch.setFormatter(formatter)
 logging.getLogger(__name__).addHandler(ch)
+
+from lxml import etree
+
+class XMLErrorLog( etree.PyErrorLog ):
+    new_map = {
+       etree.ErrorLevels.WARNING : logging.WARNING,
+       etree.ErrorLevels.ERROR   : logging.WARNING,
+       etree.ErrorLevels.FATAL   : logging.WARNING,
+        }
+    def __init__( self, *args, **kwargs ):
+        etree.PyErrorLog.__init__( self, *args, **kwargs )
+        self.level_map.update( self.new_map )
+    def receive(self, log_entry ):
+        logrepr = "%s:%d:%d:%s%s.%s:[%s]" % (
+            log_entry.filename, log_entry.line, log_entry.column, "",
+            log_entry.domain_name, log_entry.type_name, log_entry.message)
+        self.log( log_entry, logrepr )
+
+etree.use_global_python_log(XMLErrorLog(logger=logging.getLogger(__name__).getChild('XMLParser')))
 
 
 if __name__ == "__main__":
