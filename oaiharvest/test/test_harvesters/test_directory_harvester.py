@@ -18,7 +18,10 @@ from oaipmh.metadata import MetadataRegistry
 from six import PY3
 
 from oaiharvest.exceptions import NotOAIPMHBaseURLException
-from oaiharvest.harvest import OAIHarvester, DirectoryOAIHarvester
+from oaiharvest.harvesters.base import OAIHarvester
+from oaiharvest.harvesters.directory_harvester import DirectoryOAIHarvester
+from oaiharvest.record import Record
+from oaiharvest.stores.directory_store import DirectoryRecordStore
 
 
 class DirectoryOAIHarvesterTestCase(unittest.TestCase):
@@ -43,19 +46,19 @@ class DirectoryOAIHarvesterTestCase(unittest.TestCase):
             nRecs=10
         )
         self.assertIsInstance(harvester, OAIHarvester)
-        self.assertEqual(harvester._dir, self.dir_path)
-        self.assertFalse(harvester.respectDeletions)
-        self.assertTrue(harvester.createSubDirs)
         self.assertEqual(harvester.nRecs, 10)
+        self.assertFalse(harvester.respectDeletions)
+
+        self.assertIsInstance(harvester.store, DirectoryRecordStore)
+        self.assertEqual(harvester.store.directory, self.dir_path)
+        self.assertTrue(harvester.store.createSubDirs)
 
     def test_init_defaults(self):
         self.assertIsInstance(self.harvester, OAIHarvester)
-        self.assertEqual(self.harvester._dir, self.dir_path)
         self.assertTrue(self.harvester.respectDeletions)
-        self.assertFalse(self.harvester.createSubDirs)
         self.assertEqual(self.harvester.nRecs, 0)
 
-    @patch('oaiharvest.harvest.Client')
+    @patch('oaiharvest.harvesters.base.Client')
     def test_listRecords_on_non_OAI_target(self, MockClient):
         client = MockClient.return_value
         client.identify.side_effect = IndexError
@@ -64,10 +67,13 @@ class DirectoryOAIHarvesterTestCase(unittest.TestCase):
         with self.assertRaises(NotOAIPMHBaseURLException):
             list(self.harvester._listRecords(url))
 
-    @patch('oaiharvest.harvest.Client')
+    @patch('oaiharvest.harvesters.base.Client')
     def test_listRecords(self, MockClient):
         client = MockClient.return_value
-        mock_recs = [(Mock(), Mock(), Mock)]
+        header = Mock()
+        metadata = Mock()
+        about = Mock()
+        mock_recs = [(header, metadata, about)]
         client.listRecords.return_value = iter(mock_recs)
         url = 'https://oai.example.com'
 
@@ -77,14 +83,16 @@ class DirectoryOAIHarvesterTestCase(unittest.TestCase):
             foo='bar'
         )
         for rec, expected in zip(recs, mock_recs):
-            self.assertEqual(rec, expected)
+            self.assertEqual(header, rec.header)
+            self.assertEqual(metadata, rec.metadata)
+            self.assertEqual(about, rec.about)
 
         client.listRecords.assert_called_once_with(
             metadataPrefix='oai_dc',
             foo='bar'
         )
 
-    @patch('oaiharvest.harvest.Client')
+    @patch('oaiharvest.harvesters.base.Client')
     def test_harvest(self, MockClient):
         mock_recs = [
             self._make_pyoai_record(),
