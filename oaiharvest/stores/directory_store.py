@@ -1,10 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Document directory_store here.
-
-Copyright (C) 2020, Auto Trader UK
-Created 01. Jul 2020 22:14
-
-"""
+"""Document directory_store here."""
 import codecs
 import logging
 import os

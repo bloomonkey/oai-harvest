@@ -1,13 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Document directory_harvester here.
-
-Copyright (C) 2020, Auto Trader UK
-Created 01. Jul 2020 22:03
-
-"""
+"""Document directory_harvester here."""
 import logging
 
-from oaiharvest.harvesters.base import OAIHarvester
+from oaiharvest.harvesters.base import OAIHarvester, OAIRecordGetter
 from oaiharvest.stores.directory_store import DirectoryRecordStore
 
 
@@ -21,7 +16,7 @@ class DirectoryOAIHarvester(OAIHarvester):
     def __init__(
         self, mdRegistry, directory, respectDeletions=True, createSubDirs=False, nRecs=0
     ):
-        OAIHarvester.__init__(self, mdRegistry)
+        self.record_getter = OAIRecordGetter(mdRegistry)
         self.store = DirectoryRecordStore(directory, createSubDirs)
         self.respectDeletions = respectDeletions
         self.nRecs = nRecs
@@ -40,7 +35,7 @@ class DirectoryOAIHarvester(OAIHarvester):
         # A counter for the number of records actually returned
         # enumerate() not used as it would include deleted records
         i = 0
-        for record in self._listRecords(
+        for record in self.record_getter.get_records(
             baseUrl, metadataPrefix=metadataPrefix, **kwargs
         ):
 

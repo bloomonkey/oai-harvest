@@ -1,11 +1,4 @@
 # -*- coding: utf-8 -*-
-"""TODO: Document test_harvest here.
-
-Copyright (C) 2017, Auto Trader UK
-Created 19. Apr 2017 17:42
-Creator: john.harrison
-
-"""
 import os
 import shutil
 import unittest
@@ -17,10 +10,8 @@ from oaipmh.common import Header
 from oaipmh.metadata import MetadataRegistry
 from six import PY3
 
-from oaiharvest.exceptions import NotOAIPMHBaseURLException
 from oaiharvest.harvesters.base import OAIHarvester
 from oaiharvest.harvesters.directory_harvester import DirectoryOAIHarvester
-from oaiharvest.record import Record
 from oaiharvest.stores.directory_store import DirectoryRecordStore
 
 
@@ -53,33 +44,6 @@ class DirectoryOAIHarvesterTestCase(unittest.TestCase):
         self.assertIsInstance(self.harvester, OAIHarvester)
         self.assertTrue(self.harvester.respectDeletions)
         self.assertEqual(self.harvester.nRecs, 0)
-
-    @patch("oaiharvest.harvesters.base.Client")
-    def test_listRecords_on_non_OAI_target(self, MockClient):
-        client = MockClient.return_value
-        client.identify.side_effect = IndexError
-        url = "https://www.example.com"
-
-        with self.assertRaises(NotOAIPMHBaseURLException):
-            list(self.harvester._listRecords(url))
-
-    @patch("oaiharvest.harvesters.base.Client")
-    def test_listRecords(self, MockClient):
-        client = MockClient.return_value
-        header = Mock()
-        metadata = Mock()
-        about = Mock()
-        mock_recs = [(header, metadata, about)]
-        client.listRecords.return_value = iter(mock_recs)
-        url = "https://oai.example.com"
-
-        recs = self.harvester._listRecords(url, metadataPrefix="oai_dc", foo="bar")
-        for rec, expected in zip(recs, mock_recs):
-            self.assertEqual(header, rec.header)
-            self.assertEqual(metadata, rec.metadata)
-            self.assertEqual(about, rec.about)
-
-        client.listRecords.assert_called_once_with(metadataPrefix="oai_dc", foo="bar")
 
     @patch("oaiharvest.harvesters.base.Client")
     def test_harvest(self, MockClient):

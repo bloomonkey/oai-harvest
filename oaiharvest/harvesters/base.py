@@ -1,21 +1,19 @@
 # -*- coding: utf-8 -*-
-"""Document base here.
-
-Copyright (C) 2020, Auto Trader UK
-Created 01. Jul 2020 22:03
-
-"""
+"""Document base here."""
 import ast
 import logging
+from abc import ABCMeta
 from datetime import datetime, timedelta
 from time import sleep
 
+import six
 from oaipmh.client import Client
 
 from oaiharvest.exceptions import NotOAIPMHBaseURLException
 from oaiharvest.record import Record
 
 
+@six.add_metaclass(ABCMeta)
 class OAIHarvester(object):
     """Abstract Base Class for an OAI-PMH Harvester.
 
@@ -23,6 +21,14 @@ class OAIHarvester(object):
     records (e.g. put them in a directory, VCS repository, local database etc.
     """
 
+    def harvest(self, baseUrl, metadataPrefix, **kwargs):
+        "Harvest records"
+        raise NotImplementedError(
+            "{0.__class__.__name__} must be sub-classed".format(self)
+        )
+
+
+class OAIRecordGetter(object):
     def __init__(self, mdRegistry):
         self._mdRegistry = mdRegistry
 
@@ -47,7 +53,7 @@ class OAIHarvester(object):
             return self.pause(now, start + timedelta(days=1))
         # If we reach this point, there is no need to pause.
 
-    def _listRecords(self, baseUrl, metadataPrefix="oai_dc", **kwargs):
+    def get_records(self, baseUrl, metadataPrefix="oai_dc", **kwargs):
         # Generator to yield records from baseUrl in the given metadataPrefix
         # Add metatdataPrefix to args
         kwargs["metadataPrefix"] = metadataPrefix
@@ -72,9 +78,3 @@ class OAIHarvester(object):
                 metadata = ast.literal_eval(metadata).decode("utf-8")
             yield Record(header, metadata, about)
             self.maybe_pause_if_incremental(incremental_range)
-
-    def harvest(self, baseUrl, metadataPrefix, **kwargs):
-        "Harvest records"
-        raise NotImplementedError(
-            "{0.__class__.__name__} must be sub-classed".format(self)
-        )
