@@ -94,20 +94,13 @@ Requirements / Dependencies
 - lxml_
 - sqlite3_
 
-Note that Python 3.x support requires pyoai 2.4.6+.
-
-As this release is not yet available on PyPI, use
-``pip3 install git+https://github.com/infrae/pyoai.git``
-
-Python3 support is still in beta and might have some bugs.
-
 Installation
 ------------
 
 Users
 ~~~~~
 
-``pip install git+http://github.com/bloomonkey/oai-harvest.git#egg=oaiharvest``
+``pip install oaiharvest``
 
 
 Developers
