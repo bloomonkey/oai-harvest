@@ -40,13 +40,11 @@ class DirectoryRecordStore(object):
             pass
 
     def _get_output_filepath(self, header, metadataPrefix):
-        filename = "{0}.{1}.xml".format(
-            header.identifier(),
-            metadataPrefix)
+        filename = "{0}.{1}.xml".format(header.identifier(), metadataPrefix)
 
         protected = []
-        if platform.system() != 'Windows':
-            protected.append(':')
+        if platform.system() != "Windows":
+            protected.append(":")
 
         if self.createSubDirs:
             if isinstance(self.createSubDirs, string_types):
@@ -57,14 +55,12 @@ class DirectoryRecordStore(object):
             # can be created
             protected.append(os.path.sep)
 
-        filename = urllib.quote(filename, ''.join(protected))
+        filename = urllib.quote(filename, "".join(protected))
         fp = os.path.join(self.directory, filename)
         return fp
 
     def _ensure_dir_exists(self, fp):
         if not os.path.isdir(os.path.dirname(fp)):
             # Missing base directory or sub-directory
-            self.logger.debug(
-                "Creating target directory {0}".format(self.directory)
-            )
+            self.logger.debug("Creating target directory {0}".format(self.directory))
             os.makedirs(os.path.dirname(fp))

@@ -5,14 +5,8 @@ Copyright (C) 2020, Auto Trader UK
 Created 01. Jul 2020 22:03
 
 """
-import codecs
 import logging
-import os
-import platform
 
-from six import string_types
-
-from oaiharvest.record import Record
 from oaiharvest.harvesters.base import OAIHarvester
 from oaiharvest.stores.directory_store import DirectoryRecordStore
 
@@ -24,8 +18,9 @@ class DirectoryOAIHarvester(OAIHarvester):
     time.
     """
 
-    def __init__(self, mdRegistry, directory,
-                 respectDeletions=True, createSubDirs=False, nRecs=0):
+    def __init__(
+        self, mdRegistry, directory, respectDeletions=True, createSubDirs=False, nRecs=0
+    ):
         OAIHarvester.__init__(self, mdRegistry)
         self.store = DirectoryRecordStore(directory, createSubDirs)
         self.respectDeletions = respectDeletions
@@ -46,13 +41,14 @@ class DirectoryOAIHarvester(OAIHarvester):
         # enumerate() not used as it would include deleted records
         i = 0
         for record in self._listRecords(
-                 baseUrl,
-                 metadataPrefix=metadataPrefix,
-                 **kwargs):
+            baseUrl, metadataPrefix=metadataPrefix, **kwargs
+        ):
 
             if self.nRecs and self.nRecs > 0 and self.nRecs <= i:
-                logger.info("Stopping harvest; set limit of {0} has been "
-                            "reached".format(self.nRecs))
+                logger.info(
+                    "Stopping harvest; set limit of {0} has been "
+                    "reached".format(self.nRecs)
+                )
                 break
 
             if not record.header.isDeleted():

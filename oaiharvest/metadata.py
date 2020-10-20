@@ -6,6 +6,7 @@ from oaipmh.metadata import MetadataRegistry
 from lxml.etree import tostring
 import six
 
+
 class DefaultingMetadataRegistry(MetadataRegistry):
     """MetadataRegistry with default reader and/or writer.
 
@@ -19,9 +20,7 @@ class DefaultingMetadataRegistry(MetadataRegistry):
 
     def readMetadata(self, metadata_prefix, element):
         try:
-            return MetadataRegistry.readMetadata(self,
-                                                 metadata_prefix,
-                                                 element)
+            return MetadataRegistry.readMetadata(self, metadata_prefix, element)
         except KeyError as key_error:
             try:
                 return self.defaultReader(element)
@@ -30,11 +29,9 @@ class DefaultingMetadataRegistry(MetadataRegistry):
 
     def writeMetadata(self, metadata_prefix, element, metadata):
         try:
-            return MetadataRegistry.writeMetadata(self,
-                                                  metadata_prefix,
-                                                  element,
-                                                  metadata
-                                                  )
+            return MetadataRegistry.writeMetadata(
+                self, metadata_prefix, element, metadata
+            )
         except KeyError as key_error:
             try:
                 return self.defaultWriter(element, metadata)
@@ -44,12 +41,12 @@ class DefaultingMetadataRegistry(MetadataRegistry):
 
 class XMLMetadataReader(object):
     """Really simple MetadataReader to serialize metadata to pretty XML."""
+
     def __call__(self, metadata_element):
         # Six call fixes 'sequence item 0: expected str instance, bytes found'
-        return '\n'.join(
-          [six.text_type(
-              tostring(rec_element,
-                    method="xml",
-                    pretty_print=True))
-           for rec_element
-           in metadata_element])
+        return "\n".join(
+            [
+                six.text_type(tostring(rec_element, method="xml", pretty_print=True))
+                for rec_element in metadata_element
+            ]
+        )

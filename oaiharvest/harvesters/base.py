@@ -28,8 +28,8 @@ class OAIHarvester(object):
 
     def pause(self, now, until):
         """ Unconditionally pause the process from `now` to `until`. """
-        logger = logging.getLogger(__name__).getChild('OAIHarvester.pause')
-        logger.info('Pausing until {} (incremental harvest).'.format(until))
+        logger = logging.getLogger(__name__).getChild("OAIHarvester.pause")
+        logger.info("Pausing until {} (incremental harvest).".format(until))
         sleep((until - now) / timedelta(seconds=1))
 
     def maybe_pause_if_incremental(self, time_range):
@@ -50,9 +50,9 @@ class OAIHarvester(object):
     def _listRecords(self, baseUrl, metadataPrefix="oai_dc", **kwargs):
         # Generator to yield records from baseUrl in the given metadataPrefix
         # Add metatdataPrefix to args
-        kwargs['metadataPrefix'] = metadataPrefix
+        kwargs["metadataPrefix"] = metadataPrefix
         client = Client(baseUrl, self._mdRegistry)
-        incremental_range = kwargs.pop('between', None)
+        incremental_range = kwargs.pop("between", None)
         # Check that baseUrl actually represents an OAI-PMH target
         try:
             client.identify()
