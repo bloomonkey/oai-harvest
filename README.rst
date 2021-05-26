@@ -53,16 +53,10 @@ providers. `Examples`_ of how to accomplish these tasks are available
 below.
 
 
-Author(s)
----------
-
-John Harrison <john.harrison@liv.ac.uk> at the `University of Liverpool`_ 
-
-
 Latest Version
 --------------
 
-The latest release version is available in the Python Packages Index:
+The latest stable release version is available in the Python Packages Index:
 
 https://pypi.python.org/pypi/oaiharvest
 
