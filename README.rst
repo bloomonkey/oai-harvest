@@ -19,7 +19,6 @@ Contents
 --------
 
 - `Description`_
-- `Author(s)`_
 - `Latest Version`_
 - `Documentation`_
 - `Requirements / Dependencies`_
