@@ -37,7 +37,7 @@ requests in order to avoid repeatedly harvesting unmodified records.
 
 This could be used in conjunction with a scheduler (e.g. CRON) to
 maintain a reasonably up-to-date copy of the record in one or more
-providers. `Examples`_ of how to accomplish these tasks are available
+providers. [Examples of how to accomplish these tasks](#examples) are available
 below.
 
 
