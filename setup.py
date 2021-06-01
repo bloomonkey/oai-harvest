@@ -11,7 +11,7 @@ _author = 'John Harrison'
 _author_email = 'john@bloomonkey.co.uk'
 
 # Find longer description from README
-with open('README.rst', 'r') as fh:
+with open('README.md', 'r') as fh:
     _long_description = fh.read()
 
 # Requirements
