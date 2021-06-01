@@ -5,6 +5,9 @@
 - Incremental harvesting during a given time window
 - Option to resume from a given token
 
+### Removed
+- Support for Python < 3.6
+
 ### Changed
 - Adopt codestyle from [black](https://black.readthedocs.io/en/stable/)
 - Refactor out fetching records
