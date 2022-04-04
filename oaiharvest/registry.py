@@ -34,7 +34,7 @@ from argparse import ArgumentParser
 from datetime import datetime
 
 # Import oaipmh for validation purposes
-from oaipmh.client import Client
+from .client import Client
 from oaipmh.metadata import MetadataRegistry, oai_dc_reader
 from oaipmh.error import XMLSyntaxError
 from six.moves.urllib.error import HTTPError

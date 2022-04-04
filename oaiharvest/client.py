@@ -18,6 +18,9 @@ from lxml import etree
 import time
 import codecs
 
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
+
 from oaipmh import common, metadata, validation, error
 from oaipmh.datestamp import datestamp_to_datetime, datetime_to_datestamp
 
