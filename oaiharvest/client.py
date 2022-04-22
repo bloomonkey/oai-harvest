@@ -39,8 +39,9 @@ class BaseClient(common.OAIPMH):
         'wait-default': WAIT_DEFAULT,
         # how many times should we retry
         'retry': WAIT_MAX,
-        # which HTTP codes are expected
-        'expected-errcodes': {503},
+        # which HTTP codes are expected: 503 is Service Unavailable
+        # added 502:Bad Gateway, which is what we get from Proxy Errors
+        'expected-errcodes': {503,502},
     }
 
     def __init__(self, metadata_registry=None, custom_retry_policy=None, recover=False):
@@ -410,6 +411,8 @@ def retrieveFromUrlWaiting(request,
             break
         except urllib2.HTTPError as e:
             if e.code in expected_errcodes:
+                print(e)
+                print('Retry:', request.get_selector())
                 try:
                     retryAfter = int(e.hdrs.get('Retry-After'))
                 except TypeError:
