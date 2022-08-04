@@ -13,6 +13,13 @@ OAI-PMH Harvest
    :alt: license:BSD
 
 
+Modified Fork
+=============
+
+--recover option uses recovery option on XML parser to try to parse invalid payloads
+
+pip3 install git+https://github.com/sdm7g/oai-harvest.git@fix-pyoai
+
 Contents
 --------
 

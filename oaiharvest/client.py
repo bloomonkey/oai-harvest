@@ -24,8 +24,8 @@ ssl._create_default_https_context = ssl._create_unverified_context
 from oaipmh import common, metadata, validation, error
 from oaipmh.datestamp import datestamp_to_datetime, datetime_to_datestamp
 
-WAIT_DEFAULT = 120 # two minutes
-WAIT_MAX = 5
+WAIT_DEFAULT = 300 # five minutes
+WAIT_MAX = 3
 
 class Error(Exception):
     pass
@@ -40,8 +40,8 @@ class BaseClient(common.OAIPMH):
         # how many times should we retry
         'retry': WAIT_MAX,
         # which HTTP codes are expected: 503 is Service Unavailable
-        # added 502:Bad Gateway, which is what we get from Proxy Errors
-        'expected-errcodes': {503,502},
+        # added 504:Gateway Timeout, 502:Bad Gateway to catch proxy timeouts
+        'expected-errcodes': {504,503,502},
     }
 
     def __init__(self, metadata_registry=None, custom_retry_policy=None, recover=False):
